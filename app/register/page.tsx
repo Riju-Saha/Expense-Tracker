@@ -46,30 +46,53 @@ export default function Register() {
   };
 
   return (
-    <Container>
-      <Card>
-        <div className="card-body">
-          <h3 className="card-title text-center mb-4">Register</h3>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <TextInput name="Name" value={name} onChange={handleNameChange} />
-            </div>
+<>
 
-            <div className="mb-3">
-              <TextInput name="Email" value={email} onChange={handleEmailChange} />
-            </div>
 
-            <div className="mb-3">
-              <TextInput name="Password" value={password} onChange={handlePasswordChange} />
-            </div>
-
-            <div className="mb-3" style={{ width: '20%', backgroundColor: 'white', color: 'black', margin: 'auto', textAlign: 'center' }}>
-              <button type="submit">Register</button>
-            </div>
-          </form>
+<Container>
+  <Card>
+    <div className="card-body">
+      <button
+        onClick={() => window.location.href = '/login'} // Redirect to login page
+        style={{
+          position: 'absolute',
+          top: '10px',
+          right: '10px',
+          backgroundColor: '#f5f5f5',
+          color: 'black',
+          padding: '10px 15px',
+          borderRadius: '5px',
+          border: 'none',
+          cursor: 'pointer',
+        }}
+      >
+        Login
+      </button>
+      
+      <h3 className="card-title text-center mb-4">Register</h3>
+      <form onSubmit={handleSubmit}>
+        <div className="mb-3">
+          <TextInput name="Name" value={name} onChange={handleNameChange} />
         </div>
-      </Card>
-    </Container>
+
+        <div className="mb-3">
+          <TextInput name="Email" value={email} onChange={handleEmailChange} />
+        </div>
+
+        <div className="mb-3">
+          <TextInput name="Password" value={password} onChange={handlePasswordChange} />
+        </div>
+
+        <div className="mb-3" style={{ width: '20%', backgroundColor: 'white', color: 'black', margin: 'auto', textAlign: 'center' }}>
+          <button type="submit">Register</button>
+        </div>
+      </form>
+    </div>
+  </Card>
+</Container>
+
+
+</>
   );
 }
 
