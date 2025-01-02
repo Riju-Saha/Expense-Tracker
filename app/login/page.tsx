@@ -63,7 +63,7 @@ export default function Login() {
   <Card>
     <div className="card-body">
       <button
-        onClick={() => window.location.href = '/login'} // Redirect to login page
+        onClick={() => window.location.href = '/register'} // Redirect to login page
         style={{
           position: 'absolute',
           top: '10px',

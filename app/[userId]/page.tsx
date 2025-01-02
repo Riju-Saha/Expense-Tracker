@@ -1,4 +1,5 @@
 "use client";
+import Navbar from '../components/Navbar';
 
 import { useParams } from 'next/navigation';
 
@@ -9,8 +10,11 @@ export default function UserPage() {
   console.log("Received userId:", userId);
 
   return (
-    <div>
-      <h1>Welcome, User {userId}!</h1>
-    </div>
+    <>
+      <Navbar />
+      <div>
+        <h1>Welcome, User {userId}!</h1>
+      </div>
+    </>
   );
 }
