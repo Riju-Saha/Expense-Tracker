@@ -5,9 +5,9 @@ import TextInput from '../components/textInput';
 
 
 export default function Register() {
-  const [name, setName] = useState(""); 
-  const [email, setEmail] = useState(""); 
-  const [password, setPassword] = useState(""); 
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value);
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
@@ -16,9 +16,9 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = { name, email, password };
-  
+
     console.log("Form data to submit:", formData);
-  
+
     try {
       const response = await fetch('http://localhost:8000/api/users/register', {
         method: 'POST',
@@ -27,7 +27,7 @@ export default function Register() {
         },
         body: JSON.stringify(formData),
       });
-  
+
       if (response.ok) {
         const data = await response.json();
         console.log("Registration successful:", data);
@@ -46,72 +46,82 @@ export default function Register() {
   };
 
   return (
-<>
+    <>
+      <div style={styles.container}>
+        <div style={styles.card}>
+          <div className="card-body">
+            <button
+              onClick={() => window.location.href = '/login'} // Redirect to login page
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                backgroundColor: '#f5f5f5',
+                color: 'black',
+                padding: '10px 15px',
+                borderRadius: '5px',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              Login
+            </button>
 
+            <h3 className="card-title text-center mb-4">Register</h3>
+            <form onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <TextInput name="Name" value={name} onChange={handleNameChange} />
+              </div>
 
-<Container>
-  <Card>
-    <div className="card-body">
-      <button
-        onClick={() => window.location.href = '/login'} // Redirect to login page
-        style={{
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
-          backgroundColor: '#f5f5f5',
-          color: 'black',
-          padding: '10px 15px',
-          borderRadius: '5px',
-          border: 'none',
-          cursor: 'pointer',
-        }}
-      >
-        Login
-      </button>
-      
-      <h3 className="card-title text-center mb-4">Register</h3>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <TextInput name="Name" value={name} onChange={handleNameChange} />
+              <div className="mb-3">
+                <TextInput name="Email" value={email} onChange={handleEmailChange} />
+              </div>
+
+              <div className="mb-3">
+                <TextInput name="Password" value={password} onChange={handlePasswordChange} />
+              </div>
+
+              <div style={{ margin: 'auto', width: '20%' }}>
+                <button style={styles.button} type="submit">Register</button>
+              </div>
+            </form>
+          </div>
         </div>
-
-        <div className="mb-3">
-          <TextInput name="Email" value={email} onChange={handleEmailChange} />
-        </div>
-
-        <div className="mb-3">
-          <TextInput name="Password" value={password} onChange={handlePasswordChange} />
-        </div>
-
-        <div className="mb-3" style={{ width: '20%', backgroundColor: 'white', color: 'black', margin: 'auto', textAlign: 'center' }}>
-          <button type="submit">Register</button>
-        </div>
-      </form>
-    </div>
-  </Card>
-</Container>
+      </div>
 
 
-</>
+    </>
   );
 }
 
-const Container = styled.div`
-  background-color: #212121;
-  color: #e8e8e8;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-`;
+const styles = {
+  button: {
+    marginLeft: '10px',
+    padding: '10px 20px',
+    backgroundColor: 'white',
+    color: 'black',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '16px',
+  },
+  card: {
+    backgroundColor: '#333',
+    color: '#f5f5f5',
+    borderRadius: '10px',
+    boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+    width: '100%',
+    maxWidth: '600px',
+    padding: '27px',
+    margin: '0 20px',
+  },
+  container: {
+    backgroundColor: '#212121',
+    color: '#e8e8e8',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh',
+  }
 
-const Card = styled.div`
-  background-color: #333;
-  color: #f5f5f5;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 100%;
-  max-width: 600px;
-  padding: 27px;
-  margin: 0 20px;
-`;
+}
