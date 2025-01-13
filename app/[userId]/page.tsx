@@ -5,10 +5,10 @@ import Navbar from '../components/Navbar';
 import { useParams } from 'next/navigation';
 
 export default function UserPage() {
-  const params = useParams(); // Access route params
-  const userId = params?.userId || 'Guest'; // Fallback to 'Guest' if userId is missing
-  const [userName, setUserName] = useState(''); // State to store username
-  const [error, setError] = useState(null); // State to store any errors
+  const params = useParams(); 
+  const userId = params?.userId || 'Guest';
+  const [userName, setUserName] = useState(''); 
+  const [error, setError] = useState(null); 
 
   // Fetch user details from the backend
   const getDetails = async () => {
@@ -22,18 +22,17 @@ export default function UserPage() {
 
       if (response.ok) {
         const responseJson = await response.json();
-        setUserName(responseJson.user.name); // Update username state
+        setUserName(responseJson.user.name); 
       } else {
         const errorData = await response.json();
         console.error('Error fetching user:', errorData.error);
-        setError(errorData.error); // Update error state
+        setError(errorData.error); 
       }
     } catch (err) {
       console.error('Error submitting form:', err);
     }
   };
 
-  // Fetch user details when the component mounts
   useEffect(() => {
     if (userId !== 'Guest') {
       getDetails();

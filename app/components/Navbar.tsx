@@ -1,7 +1,14 @@
 import React, { useState } from "react";
+import { useRouter } from 'next/navigation';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+
+  const handleLogout = () => {
+    console.log("User logged out");
+    router.push('/login');
+  };
 
   return (
     <nav className="bg-gray-100 border-b border-gray-300 dark:bg-gray-800 dark:border-gray-700">
@@ -15,7 +22,6 @@ export default function Navbar() {
             Navbar
           </a>
 
-          {/* Links - visible on larger screens */}
           <div className="hidden lg:flex lg:items-center lg:space-x-4">
             <a
               className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
@@ -31,6 +37,16 @@ export default function Navbar() {
               Link
             </a>
           </div>
+        </div>
+
+        {/* Logout button */}
+        <div className="hidden lg:flex">
+          <button
+            onClick={handleLogout}
+            className="text-white bg-red-500 hover:bg-red-600 px-4 py-2 rounded-md font-medium"
+          >
+            Logout
+          </button>
         </div>
 
         {/* Mobile Menu Button */}
@@ -60,7 +76,7 @@ export default function Navbar() {
           </svg>
         </button>
 
-        {/* Links - visible on mobile */}
+        {/* Links and Logout - visible on mobile */}
         <div
           className={`${
             isOpen ? "block" : "hidden"
@@ -84,6 +100,14 @@ export default function Navbar() {
               >
                 Link
               </a>
+            </li>
+            <li>
+              <button
+                onClick={handleLogout}
+                className="block px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-md text-left"
+              >
+                Logout
+              </button>
             </li>
           </ul>
         </div>
