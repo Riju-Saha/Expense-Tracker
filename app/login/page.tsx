@@ -47,7 +47,6 @@ export default function Login() {
         setPassword("");
         alert("Login successful!");
 
-        // Redirect using useRouter's push method
         router.push(`/${userId}`); // Direct navigation to the user-specific page
       } else {
         const errorData = await response.json();

@@ -29,6 +29,9 @@ app.get('/', (req, res) => {
 const usersRoutes = require('./pages/api/users'); 
 app.use('/api/users', usersRoutes); 
 
+const transactionsRoutes = require('./pages/api/transactions');
+app.use('/api/transactions', transactionsRoutes);
+
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });

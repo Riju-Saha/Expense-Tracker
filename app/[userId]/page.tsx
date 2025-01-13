@@ -2,11 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
+import Transaction from '../components/transactionForm';
 import { useParams } from 'next/navigation';
 
 export default function UserPage() {
   const params = useParams(); 
-  const userId = params?.userId || 'Guest';
+  const userId = Array.isArray(params?.userId) ? params.userId[0] : params?.userId || 'Guest';
+
   const [userName, setUserName] = useState(''); 
   const [error, setError] = useState(null); 
 
@@ -42,7 +44,7 @@ export default function UserPage() {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 py-6 bg-gray-900">
         <h1 className="text-2xl font-bold">
           Welcome, {userName || `User ${userId}`}!
         </h1>
@@ -52,6 +54,7 @@ export default function UserPage() {
           </p>
         )}
       </div>
+      <Transaction userId={userId} />
     </>
   );
 }

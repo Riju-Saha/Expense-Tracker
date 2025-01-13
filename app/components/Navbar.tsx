@@ -19,7 +19,7 @@ export default function Navbar() {
             className="text-lg font-semibold text-gray-800 dark:text-white"
             href="#"
           >
-            Navbar
+            Expense Tracker
           </a>
 
           <div className="hidden lg:flex lg:items-center lg:space-x-4">
@@ -78,9 +78,8 @@ export default function Navbar() {
 
         {/* Links and Logout - visible on mobile */}
         <div
-          className={`${
-            isOpen ? "block" : "hidden"
-          } lg:hidden w-full mt-3`}
+          className={`${isOpen ? "block" : "hidden"
+            } lg:hidden w-full mt-3`}
           id="navbarSupportedContent"
         >
           <ul className="flex flex-col space-y-2">
