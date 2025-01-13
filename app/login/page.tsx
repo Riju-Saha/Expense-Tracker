@@ -29,9 +29,9 @@ export default function Login() {
       });
 
       if (response.ok) {
-        let userId, userName;
+        let userId, userName, responseJson;
         try {
-          const responseJson = await response.json();
+          responseJson = await response.json();
           userId = responseJson.user.id; // ensure backend returns userId as 'user'
           userName = responseJson.user.name;
           // console.log("the id is ", userId);
