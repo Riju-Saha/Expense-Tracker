@@ -6,11 +6,11 @@ import Transaction from '../components/transactionForm';
 import { useParams } from 'next/navigation';
 
 export default function UserPage() {
-  const params = useParams(); 
+  const params = useParams();
   const userId = Array.isArray(params?.userId) ? params.userId[0] : params?.userId || 'Guest';
 
-  const [userName, setUserName] = useState(''); 
-  const [error, setError] = useState(null); 
+  const [userName, setUserName] = useState('');
+  const [error, setError] = useState(null);
 
   // Fetch user details from the backend
   const getDetails = async () => {
@@ -24,11 +24,11 @@ export default function UserPage() {
 
       if (response.ok) {
         const responseJson = await response.json();
-        setUserName(responseJson.user.name); 
+        setUserName(responseJson.user.name);
       } else {
         const errorData = await response.json();
         console.error('Error fetching user:', errorData.error);
-        setError(errorData.error); 
+        setError(errorData.error);
       }
     } catch (err) {
       console.error('Error submitting form:', err);
