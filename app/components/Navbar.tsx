@@ -28,13 +28,13 @@ export default function Navbar() {
               href="#"
               aria-current="page"
             >
-              Home
+              Transactions
             </a>
             <a
               className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
               href="#"
             >
-              Link
+              Balance
             </a>
           </div> */}
         </div>

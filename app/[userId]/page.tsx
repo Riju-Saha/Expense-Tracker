@@ -54,7 +54,9 @@ export default function UserPage() {
           </p>
         )}
       </div>
-      <Transaction userId={userId} />
+      <Transaction userId={userId} /> 
+      {/* userName is not passed through props. It has been fetched by userId from the users table from database. 
+      sql triggers added for this */}
     </>
   );
 }

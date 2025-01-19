@@ -4,13 +4,13 @@ const connection = require('../../connection');
 
 // Route to handle inserting transactions
 router.post('/', (req, res) => {
-    const { user_id, amount, type, title, date, time } = req.body;
+    const { user_id, user_name, amount, type, title, date, time } = req.body;
   
     const sql = `
-      INSERT INTO transactions (user_id, amount, type, title, date, time)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO transactions (user_id, user_name, amount, type, title, date, time)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    const values = [user_id, amount, type, title, date, time];
+    const values = [user_id, user_name, amount, type, title, date, time];
   
     connection.query(sql, values, (err, result) => {
       if (err) {
