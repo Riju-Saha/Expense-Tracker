@@ -8,10 +8,44 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
   const [amount, setAmount] = useState('');
   const [transactionType, setTransactionType] = useState('credit');
   const [title, setTitle] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [time, setTime] = useState(new Date().toISOString().split('T')[1].slice(0, 5));
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
+
   const [transactions, setTransactions] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  // Function to get current date and time in IST
+  const updateDateTime = () => {
+    const dateInUTC = new Date();
+    const dateOptions: Intl.DateTimeFormatOptions = {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    };
+    const timeOptions: Intl.DateTimeFormatOptions = {
+      timeZone: 'Asia/Kolkata',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    };
+
+    const formattedDate = dateInUTC.toLocaleDateString('en-IN', dateOptions);
+    const formattedTime = dateInUTC.toLocaleTimeString('en-IN', timeOptions);
+
+    const [day, month, year] = formattedDate.split('/');
+    const [hours, minutes] = formattedTime.split(':');
+
+    setDate(`${year}-${month}-${day}`);
+    setTime(`${hours}:${minutes}`);
+  };
+
+  // Update date and time every second
+  useEffect(() => {
+    updateDateTime(); // Set initial values
+    const interval = setInterval(updateDateTime, 1000); // Update every second
+    return () => clearInterval(interval); // Cleanup interval on component unmount
+  }, []);
 
   // Fetch transactions when the component loads
   useEffect(() => {
@@ -36,16 +70,39 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const dateInUTC = new Date();
+
+    // Format the date to 'YYYY-MM-DD' in IST
+    const dateOptions: Intl.DateTimeFormatOptions = {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    };
+    const formattedDate = dateInUTC.toLocaleDateString('en-CA', dateOptions).toString().split('T')[0];
+
+    // Format the time to 'HH:mm' in IST
+    const timeOptions: Intl.DateTimeFormatOptions = {
+      timeZone: 'Asia/Kolkata',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    };
+    const formattedTime = dateInUTC.toLocaleTimeString('en-GB', timeOptions);
+
+    // Set the formatted date and time
+    setDate(formattedDate); // YYYY-MM-DD
+    setTime(formattedTime); // HH:mm
+
     const transactionData = {
       user_id: userId,
       amount,
       type: transactionType,
       title,
-      date,
-      time,
+      date: formattedDate,
+      time: formattedTime,
     };
 
-    // Call backend API to add the transaction
     try {
       const response = await fetch('http://localhost:8000/api/transactions', {
         method: 'POST',
@@ -56,15 +113,15 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
       });
 
       if (response.ok) {
-        // After successfully adding the transaction, reset the form fields and refresh the transaction list
+        // Reset form fields
         setAmount('');
-        setTransactionType('credit');  // Reset to default
+        setTransactionType('credit');
         setTitle('');
-        setDate(new Date().toISOString().split('T')[0]);
-        setTime(new Date().toISOString().split('T')[1].slice(0, 5));
 
-        // Refresh the transaction list
-        const updatedTransactions = await fetch(`http://localhost:8000/api/transactions/${userId}`);
+        // Refresh the transactions list
+        const updatedTransactions = await fetch(
+          `http://localhost:8000/api/transactions/${userId}`
+        );
         const data = await updatedTransactions.json();
         setTransactions(data);
       } else {
@@ -76,11 +133,13 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
     }
   };
 
+
   return (
     <div className="flex flex-col lg:flex-row">
       {/* Left Container: Transaction Form */}
-      <div className="w-full lg:w-1/2 p-6 bg-gray-800 rounded-lg">
+      <div className="w-full lg:w-1/2 p-6 bg-gray-800 lg">
         <h2 className="text-white text-2xl mb-4">Transaction Form</h2>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="number"
@@ -97,20 +156,19 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
             <option value="credit">Credit</option>
             <option value="debit">Debit</option>
           </select>
-
           <input
-          type="text"
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded"
-        />
-
+            type="text"
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded"
+          />
           <div className="flex space-x-4">
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
+
               className="p-2 bg-gray-700 text-white border border-gray-600 rounded"
             />
             <input
@@ -130,43 +188,66 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
       </div>
 
       {/* Right Container: Transaction History */}
-      <div className="w-full lg:w-1/2 p-6 bg-gray-800 rounded-lg mt-6 lg:mt-0">
+      <div className="w-full lg:w-1/2 p-6 bg-gray-800 lg mt-6 lg:mt-0">
         <h2 className="text-white text-2xl mb-4">Transaction History</h2>
         {error && <p className="text-red-500">{error}</p>}
         <div className="overflow-y-auto max-h-[400px]"> {/* Fixed height and scrollable */}
-          <table className="w-full table-auto text-white">
-            <thead>
-              <tr>
-                <th className="p-2 border-b">Amount</th>
-                <th className="p-2 border-b">Type</th>
-                <th className="p-2 border-b">Title</th>
-                <th className="p-2 border-b">Date</th>
-                <th className="p-2 border-b">Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.length > 0 ? (
-                transactions.map((transaction: any) => (
-                  <tr
-                    key={transaction.id}
-                    className={transaction.type === 'credit' ? 'bg-green-600' : 'bg-red-600'}
-                  >
-                    <td className="p-2">{transaction.date}</td>
-                    <td className="p-2">{transaction.time}</td>
-                    <td className="p-2">{transaction.type}</td> {/* Display 'type' */}
-                    <td className="p-2">{transaction.title}</td>
-                    <td className="p-2">{transaction.amount}</td>
-                  </tr>
-                ))
-              ) : (
+          <div className="overflow-x-auto max-h-[400px]">
+            <table className="w-full table-auto border-collapse border border-gray-700 text-white">
+              <thead className="bg-gray-900 sticky top-0 z-10">
                 <tr>
-                  <td colSpan={5} className="p-2 text-center">
-                    No transactions found.
-                  </td>
+                  <th className="p-4 border border-gray-700 text-left">#</th>
+                  <th className="p-4 border border-gray-700 text-left">Amount</th>
+                  <th className="p-4 border border-gray-700 text-left">Type</th>
+                  <th className="p-4 border border-gray-700 text-left">Title</th>
+                  <th className="p-4 border border-gray-700 text-left">Date</th>
+                  <th className="p-4 border border-gray-700 text-left">Time</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {transactions.length > 0 ? (
+                  transactions.map((transaction: any, index: number) => (
+                    <tr
+                      key={transaction.id}
+                      className={`text-center ${index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-700'
+                        }`}
+                    >
+                      <td className="p-4 border border-gray-700">{index + 1}</td>
+                      <td className="p-4 border border-gray-700">{transaction.amount}</td>
+                      <td
+                        className={`p-4 border border-gray-700 ${transaction.type === 'credit'
+                          ? 'text-green-500 font-bold'
+                          : 'text-red-500 font-bold'
+                          }`}
+                      >
+                        {transaction.type.charAt(0).toUpperCase() +
+                          transaction.type.slice(1)}
+                      </td>
+                      <td className="p-4 border border-gray-700">{transaction.title}</td>
+                      <td className="p-4 border border-gray-700">
+                        {(() => {
+                          const dateParts = transaction.date.split('T')[0].split('-'); // Split into [yyyy, mm, dd]
+                          return `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`; // Return dd-mm-yyyy
+                        })()}
+                      </td>
+
+                      <td className="p-4 border border-gray-700">{transaction.time}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="p-4 text-center border border-gray-700 bg-gray-800"
+                    >
+                      No transactions found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
         </div>
       </div>
     </div>
