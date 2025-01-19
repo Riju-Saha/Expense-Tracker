@@ -135,114 +135,122 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
 
 
   return (
-<div className="flex flex-col lg:flex-row">
-  {/* Left Container: Transaction Form */}
-  <div className="w-full lg:w-1/2 p-6 bg-gray-800 lg">
-    <h2 className="text-white text-xl lg:text-2xl mb-4">Transaction Form</h2>
-    {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <input
-        type="number"
-        placeholder="Amount"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-        className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded text-sm lg:text-base"
-      />
-      <select
-        value={transactionType}
-        onChange={(e) => setTransactionType(e.target.value)}
-        className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded text-sm lg:text-base"
-      >
-        <option value="credit">Credit</option>
-        <option value="debit">Debit</option>
-      </select>
-      <input
-        type="text"
-        placeholder="Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded text-sm lg:text-base"
-      />
-      <div className="flex space-x-4">
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="p-2 bg-gray-700 text-white border border-gray-600 rounded text-sm lg:text-base w-1/2"
-        />
-        <input
-          type="time"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-          className="p-2 bg-gray-700 text-white border border-gray-600 rounded text-sm lg:text-base w-1/2"
-        />
+    <div className="flex flex-col lg:flex-row">
+      {/* Left Container: Transaction Form */}
+      <div className="w-full lg:w-1/2 p-6 bg-gray-800 lg">
+        <h2 className="text-white text-xl lg:text-2xl mb-4">Transaction Form</h2>
+        {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="number"
+            placeholder="Amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded text-sm lg:text-base"
+          />
+          <select
+            value={transactionType}
+            onChange={(e) => setTransactionType(e.target.value)}
+            className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded text-sm lg:text-base"
+          >
+            <option value="credit">Credit</option>
+            <option value="debit">Debit</option>
+          </select>
+          <input
+            type="text"
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded text-sm lg:text-base"
+          />
+          <div className="flex space-x-4">
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+
+              className="p-2 bg-gray-700 text-white border border-gray-600 rounded text-sm lg:text-base"
+            />
+            <input
+              type="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              className="p-2 bg-gray-700 text-white border border-gray-600 rounded text-sm lg:text-base"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full p-2 bg-blue-500 text-white rounded text-sm lg:text-base"
+          >
+            Submit
+          </button>
+        </form>
       </div>
-      <button
-        type="submit"
-        className="w-full p-2 bg-blue-500 text-white rounded text-sm lg:text-base"
-      >
-        Submit
-      </button>
-    </form>
-  </div>
 
-  {/* Right Container: Transaction History */}
-  <div className="w-full lg:w-1/2 p-6 bg-gray-800 lg mt-6 lg:mt-0">
-    <h2 className="text-white text-xl lg:text-2xl mb-4">Transaction History</h2>
-    {error && <p className="text-red-500 text-sm">{error}</p>}
-    <div className="overflow-x-auto">
-      <table className="min-w-full table-auto border-collapse border border-gray-700 text-white text-sm lg:text-base">
-        <thead className="bg-gray-900 sticky top-0 z-10">
-          <tr>
-            <th className="p-4 border border-gray-700 text-left">#</th>
-            <th className="p-4 border border-gray-700 text-left">Amount</th>
-            <th className="p-4 border border-gray-700 text-left">Type</th>
-            <th className="p-4 border border-gray-700 text-left">Title</th>
-            <th className="p-4 border border-gray-700 text-left">Date</th>
-            <th className="p-4 border border-gray-700 text-left">Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          {transactions.length > 0 ? (
-            transactions.map((transaction: any, index: number) => (
-              <tr
-                key={transaction.id}
-                className={`text-center ${index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-700'}`}
-              >
-                <td className="p-4 border border-gray-700">{index + 1}</td>
-                <td className="p-4 border border-gray-700">{transaction.amount}</td>
-                <td
-                  className={`p-4 border border-gray-700 ${
-                    transaction.type === 'credit'
-                      ? 'text-green-500 font-bold'
-                      : 'text-red-500 font-bold'
-                  }`}
-                >
-                  {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
-                </td>
-                <td className="p-4 border border-gray-700">{transaction.title}</td>
-                <td className="p-4 border border-gray-700">
-                  {(() => {
-                    const dateParts = transaction.date.split('T')[0].split('-'); // Split into [yyyy, mm, dd]
-                    return `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`; // Return dd-mm-yyyy
-                  })()}
-                </td>
-                <td className="p-4 border border-gray-700">{transaction.time}</td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={6} className="p-4 text-center border border-gray-700 bg-gray-800">
-                No transactions found.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      {/* Right Container: Transaction History */}
+      <div className="w-full lg:w-1/2 p-6 bg-gray-800 lg mt-6 lg:mt-0">
+      <h2 className="text-white text-xl lg:text-2xl mb-4">Transaction History</h2>
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+      <div className="overflow-y-auto max-h-[400px]">
+          <div className="overflow-x-auto max-h-[400px]">
+            <table className="w-full table-auto border-collapse border border-gray-700 text-white text-sm lg:text-base">
+              <thead className="bg-gray-900 sticky top-0 z-10">
+                <tr>
+                  <th className="p-4 border border-gray-700 text-left text-center">#</th>
+                  <th className="p-4 border border-gray-700 text-left text-center">Amount</th>
+                  <th className="p-4 border border-gray-700 text-left text-center">Type</th>
+                  <th className="p-4 border border-gray-700 text-left text-center">Title</th>
+                  <th className="p-4 border border-gray-700 text-left text-center">Date</th>
+                  <th className="p-4 border border-gray-700 text-left text-center">Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.length > 0 ? (
+                  transactions.map((transaction: any, index: number) => (
+                    <tr
+                      key={transaction.id}
+                      className={`text-center ${index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-700'
+                        }`}
+                    >
+                      <td className="p-4 border border-gray-700">{index + 1}</td>
+                      <td className="p-4 border border-gray-700">{transaction.amount}</td>
+                      <td
+                        className={`p-4 border border-gray-700 ${transaction.type === 'credit'
+                          ? 'text-green-500 font-bold'
+                          : 'text-red-500 font-bold'
+                          }`}
+                      >
+                        {transaction.type.charAt(0).toUpperCase() +
+                          transaction.type.slice(1)}
+                      </td>
+                      <td className="p-4 border border-gray-700">{transaction.title}</td>
+                      <td className="p-4 border border-gray-700">
+                        {(() => {
+                          const dateParts = transaction.date.split('T')[0].split('-'); // Split into [yyyy, mm, dd]
+                          return `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`; // Return dd-mm-yyyy
+                        })()}
+                      </td>
+
+                      <td className="p-4 border border-gray-700">{transaction.time}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="p-4 text-center border border-gray-700 bg-gray-800"
+                    >
+                      No transactions found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-
   );
 };
 
