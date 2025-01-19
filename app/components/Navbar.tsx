@@ -22,7 +22,7 @@ export default function Navbar() {
             Expense Tracker
           </a>
 
-          <div className="hidden lg:flex lg:items-center lg:space-x-4">
+          {/* <div className="hidden lg:flex lg:items-center lg:space-x-4">
             <a
               className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
               href="#"
@@ -36,7 +36,7 @@ export default function Navbar() {
             >
               Link
             </a>
-          </div>
+          </div> */}
         </div>
 
         {/* Logout button */}
