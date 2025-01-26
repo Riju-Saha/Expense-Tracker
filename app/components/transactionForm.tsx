@@ -236,6 +236,7 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
                   Title
                 </th>
                 <th
+                  onClick={() => handleSort('date')}
                   className="p-4 border border-gray-700 text-left text-center cursor-pointer"
                 >
                   Date

@@ -4,9 +4,9 @@ const router = express.Router();
 
 // Route to register user
 router.post('/register', (req, res) => {
-  const { name, email, password } = req.body;
-  const sql = 'INSERT INTO users (name, email, password) VALUES (?, ?, ?)';
-  const values = [name, email, password];
+  const { name, email, password, phone } = req.body;
+  const sql = 'INSERT INTO users (name, email, password, phone) VALUES (?, ?, ?, ?)';
+  const values = [name, email, password, phone];
 
   connection.query(sql, values, (err, result) => {
     if (err) {

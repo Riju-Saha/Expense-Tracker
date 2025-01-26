@@ -8,14 +8,16 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value);
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => setPhone(e.target.value);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = { name, email, password };
+    const formData = { name, email, password, phone };
 
     console.log("Form data to submit:", formData);
 
@@ -35,6 +37,8 @@ export default function Register() {
         setName("");
         setEmail("");
         setPassword("");
+        setPhone("");
+        window.location.href = '/login';
       } else {
         const errorData = await response.json();
         console.error("Registration failed:", errorData);
@@ -79,6 +83,10 @@ export default function Register() {
 
               <div className="mb-3">
                 <TextInput name="Password" value={password} onChange={handlePasswordChange} />
+              </div>
+
+              <div className="mb-3">
+                <TextInput name="Phone" value={phone} onChange={handlePhoneChange} />
               </div>
 
               <div style={{ margin: 'auto', width: '20%' }}>
