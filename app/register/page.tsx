@@ -17,10 +17,16 @@ export default function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate phone number before sending to the backend
+    if (!/^\d{10}$/.test(phone)) {
+      alert('Phone number must be exactly 10 digits.');
+      return;
+    }
+
     const formData = { name, email, password, phone };
-  
     console.log("Form data to submit:", formData);
-  
+
     try {
       const response = await fetch('http://localhost:8000/api/users/register', {
         method: 'POST',
@@ -29,7 +35,7 @@ export default function Register() {
         },
         body: JSON.stringify(formData),
       });
-  
+
       if (response.ok) {
         const data = await response.json();
         console.log("Registration successful:", data);
@@ -47,6 +53,8 @@ export default function Register() {
           alert('The name is already registered. Please choose another name.');
         } else if (errorData.error.includes('email')) {
           alert('The email is already registered. Please use another email.');
+        } else if (errorData.error.includes('Phone number')) {
+          alert(errorData.error); // Handle the phone number error
         } else {
           alert('Registration failed. Please try again.');
         }
@@ -57,8 +65,9 @@ export default function Register() {
       alert('Error submitting form. Please try again later.');
     }
   };
-  
-  
+
+
+
 
   return (
     <>

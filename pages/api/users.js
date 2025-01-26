@@ -6,6 +6,11 @@ const router = express.Router();
 router.post('/register', (req, res) => {
   const { name, email, password, phone } = req.body;
 
+  // Validate phone number length
+  if (!/^\d{10}$/.test(phone)) {
+    return res.status(400).json({ error: 'Phone number must be exactly 10 digits.' });
+  }
+
   // Check if the name or email already exists
   const checkQuery = 'SELECT * FROM users WHERE name = ? OR email = ?';
   connection.query(checkQuery, [name, email], (err, results) => {
@@ -42,7 +47,6 @@ router.post('/register', (req, res) => {
     });
   });
 });
-
 
 
 // Route to login user
