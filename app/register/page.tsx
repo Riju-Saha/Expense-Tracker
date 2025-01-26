@@ -18,9 +18,9 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = { name, email, password, phone };
-
+  
     console.log("Form data to submit:", formData);
-
+  
     try {
       const response = await fetch('http://localhost:8000/api/users/register', {
         method: 'POST',
@@ -29,11 +29,11 @@ export default function Register() {
         },
         body: JSON.stringify(formData),
       });
-
+  
       if (response.ok) {
         const data = await response.json();
         console.log("Registration successful:", data);
-        alert("Registered sucessfully!")
+        alert("Registered successfully!");
         setName("");
         setEmail("");
         setPassword("");
@@ -41,6 +41,15 @@ export default function Register() {
         window.location.href = '/login';
       } else {
         const errorData = await response.json();
+        if (errorData.error.includes('name and email')) {
+          alert('The name and email are already registered. Please try another.');
+        } else if (errorData.error.includes('name')) {
+          alert('The name is already registered. Please choose another name.');
+        } else if (errorData.error.includes('email')) {
+          alert('The email is already registered. Please use another email.');
+        } else {
+          alert('Registration failed. Please try again.');
+        }
         console.error("Registration failed:", errorData);
       }
     } catch (err) {
@@ -48,6 +57,8 @@ export default function Register() {
       alert('Error submitting form. Please try again later.');
     }
   };
+  
+  
 
   return (
     <>
