@@ -90,10 +90,13 @@ export default function Login() {
               <TextInput name="Password" value={password} onChange={handlePasswordChange} />
             </div>
 
-            <div style={{ margin: 'auto', width: '20%' }}>
+            <div style={styles.buttonContainer}>
               <button style={styles.button} type="submit">Login</button>
+              <button style={styles.button}>Login with OTP?</button>
             </div>
           </form>
+
+
         </div>
       </div>
     </div>
@@ -103,7 +106,6 @@ export default function Login() {
 
 const styles = {
   button: {
-    marginLeft: '10px',
     padding: '10px 20px',
     backgroundColor: 'white',
     color: 'black',
@@ -111,6 +113,14 @@ const styles = {
     borderRadius: '5px',
     cursor: 'pointer',
     fontSize: '16px',
+  },
+  buttonContainer: {
+    display: 'flex',
+    justifyContent: 'center', // Center the buttons horizontally
+    gap: '10px', // Add space between the buttons
+    marginTop: '20px', // Add some space above buttons
+    width: '100%',
+    position: 'relative' as 'relative',
   },
   card: {
     backgroundColor: '#333',
@@ -130,5 +140,5 @@ const styles = {
     alignItems: 'center',
     height: '100vh',
   }
+};
 
-}

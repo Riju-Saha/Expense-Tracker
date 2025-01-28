@@ -54,7 +54,7 @@ export default function Register() {
         } else if (errorData.error.includes('email')) {
           alert('The email is already registered. Please use another email.');
         } else if (errorData.error.includes('Phone number')) {
-          alert(errorData.error); // Handle the phone number error
+          alert(errorData.error); 
         } else {
           alert('Registration failed. Please try again.');
         }
@@ -65,9 +65,6 @@ export default function Register() {
       alert('Error submitting form. Please try again later.');
     }
   };
-
-
-
 
   return (
     <>
