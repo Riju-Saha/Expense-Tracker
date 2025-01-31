@@ -5,185 +5,135 @@ import TextInput from '../components/textInput';
 import { useRouter } from 'next/navigation';
 
 export default function OtpLogin() {
-    const [name, setName] = useState("");
-    const [otp, setOtp] = useState(['', '', '', '', '', '']);
-    const router = useRouter();
+  const [name, setName] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const router = useRouter();
 
-    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value);
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value);
 
-    const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-        const newOtp = [...otp];
-        const value = e.target.value;
+  const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const newOtp = [...otp];
+    const value = e.target.value;
 
-        if (value && !/^\d$/.test(value)) {
-            newOtp[index] = '';
-            setOtp(newOtp);
-            return;
-        }
-
-        newOtp[index] = value.slice(0, 1);
-        setOtp(newOtp);
-
-        if (value && index < otp.length - 1) {
-            const nextInput = document.getElementById(`otp-input-${index + 1}`);
-            if (nextInput) {
-                nextInput.focus();
-            }
-        }
-
-        if (!value && index > 0) {
-            const prevInput = document.getElementById(`otp-input-${index - 1}`);
-            if (prevInput) {
-                prevInput.focus();
-            }
-        }
-
-    };
-
-    const handleOtpSent = async (e: React.FormEvent) => {
-        e.preventDefault(); // prevent form submission side effects if used within a form
-      
-        if (name.trim().length > 1) {
-          const formData = { name };
-          console.log("Form data to submit:", formData);
-      
-          try {
-            const response = await fetch('http://localhost:8000/api/users/userCheck', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(formData),
-            });
-      
-            if (response.ok) {
-              alert("Check your email for the OTP.");
-            } else {
-              const errorData = await response.json(); // Read error details from the backend
-              alert(errorData.message || "This name doesn't exist.");
-            }
-          } catch (error) {
-            console.error("Network error:", error);
-            alert("Something went wrong. Please try again later.");
-          }
-        } else {
-          alert("Kindly provide a valid name first.");
-        }
-      };
-      
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const formData = { name, otp };
-
-        console.log("Form data to submit:", formData);
-
-        try {
-            const response = await fetch('http://localhost:8000/api/users/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-
-            if (response.ok) {
-                let userId, userName, responseJson;
-                try {
-                    responseJson = await response.json();
-                    userId = responseJson.user.id; // ensure backend returns userId as 'user'
-                    userName = responseJson.user.name;
-                    // console.log("the id is ", userId);
-                    // console.log("got data ", responseJson.user.name);
-                } catch (error) {
-                    console.error("Error parsing JSON response:", error);
-                    alert("Error parsing server response. Please try again.");
-                    return;
-                }
-
-                console.log("Login successful:", userId);
-                setName("");
-                setOtp(['', '', '', '', '', '']); // Reset OTP to an empty array
-                alert("Login successful!");
-
-                router.push(`/${userId}`); // Direct navigation to the user-specific page
-            } else {
-                const errorData = await response.json();
-                console.error("Login failed:", errorData);
-                alert("Login failed: " + errorData.error);
-            }
-        } catch (err) {
-            console.error("Error submitting form:", err);
-            alert("Error submitting form. Please try again later.");
-        }
-    };
-
-
-    function handleLoginWithPassword() {
-        router.push('/login');
+    if (value && !/^\d$/.test(value)) {
+      return;
     }
 
+    newOtp[index] = value.slice(0, 1);
+    setOtp(newOtp);
 
+    if (value && index < otp.length - 1) {
+      const nextInput = document.getElementById(`otp-input-${index + 1}`);
+      if (nextInput) {
+        nextInput.focus();
+      }
+    }
+  };
 
-    return (
-        <div style={styles.container}>
-            <div style={styles.card}>
-                <div className="card-body">
-                    <button
-                        onClick={() => window.location.href = '/register'} // Redirect to login page
-                        style={{
-                            position: 'absolute',
-                            top: '10px',
-                            right: '10px',
-                            backgroundColor: '#f5f5f5',
-                            color: 'black',
-                            padding: '10px 15px',
-                            borderRadius: '5px',
-                            border: 'none',
-                            cursor: 'pointer',
-                        }}
-                    >
-                        Register
-                    </button>
+  const handleOtpSent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (name.trim().length > 1) {
+      try {
+        const response = await fetch('http://localhost:8000/api/users/userCheck', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name }),
+        });
 
-                    <h3 className="card-title text-center mb-4" style={{ fontSize: '22px' }}>Login</h3>
-                    <form onSubmit={handleSubmit}>
-                        <div className="mb-3">
-                            <TextInput name="Name" value={name} onChange={handleNameChange} />
-                        </div>
-                        <div className='mb-2 mt-2' style={{ display: 'flex', justifyContent: 'center' }}>
+        if (response.ok) {
+          alert('Check your email for the OTP.');
+        } else {
+          const errorData = await response.json();
+          alert(errorData.message || "This name doesn't exist.");
+        }
+      } catch (error) {
+        console.error('Network error:', error);
+        alert('Something went wrong. Please try again later.');
+      }
+    } else {
+      alert('Kindly provide a valid name first.');
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('http://localhost:8000/api/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, otp }),
+      });
+
+      if (response.ok) {
+        const responseJson = await response.json();
+        const userId = responseJson.user.id;
+        setName('');
+        setOtp(['', '', '', '', '', '']);
+        alert('Login successful!');
+        router.push(`/${userId}`);
+      } else {
+        const errorData = await response.json();
+        alert('Login failed: ' + errorData.error);
+      }
+    } catch (err) {
+      console.error('Error submitting form:', err);
+      alert('Error submitting form. Please try again later.');
+    }
+  };
+
+  const handleLoginWithPassword = () => {
+    router.push('/login');
+  };
+
+  return (
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <button
+          onClick={() => window.location.href = '/register'}
+          style={{
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            backgroundColor: '#f5f5f5',
+            color: 'black',
+            padding: '10px 15px',
+            borderRadius: '5px',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          Register
+        </button>
+        <h3 className="card-title text-center mb-4" style={{ fontSize: '22px' }}>Login</h3>
+        <form onSubmit={handleSubmit}>
+          <TextInput name="Name" value={name} onChange={handleNameChange} />
+          <div className='mb-2 mt-2' style={{ display: 'flex', justifyContent: 'center' }}>
                             <button style={styles.button} type='button' onClick={handleOtpSent}>Sent Otp</button>
                         </div>
-                        <div className="mb-3" style={styles.otp_container}> OTP
-
-                        <div className="mb-3" style={styles.otp_container}> OTP 
-                            {otp.map((digit, index) => (
-                                <input
-                                    key={index}
-                                    id={`otp-input-${index}`}
-                                    type="text"
-                                    value={digit}
-                                    onChange={(e) => handleOtpChange(e, index)}
-                                    maxLength={1}
-                                    placeholder="-"
-                                    style={styles.otp_input_box}
-                                />
-                            ))}
-
-                        </div>
-
-                        <div style={styles.buttonContainer}>
-                            <button style={styles.button} type="submit">Login</button>
-                            <button style={styles.button} type="submit" onClick={handleLoginWithPassword}>Login with password?</button>
-                        </div>
-
-                        <div style={{ margin: 'auto', width: '20%' }}>
-                            <button style={styles.button} type="submit">Login</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    );
+          <div style={styles.otp_container}>
+            {otp.map((digit, index) => (
+              <input
+                key={index}
+                id={`otp-input-${index}`}
+                type="text"
+                value={digit}
+                onChange={(e) => handleOtpChange(e, index)}
+                maxLength={1}
+                placeholder="-"
+                style={styles.otp_input_box}
+              />
+            ))}
+          </div>
+          <div style={styles.buttonContainer}>
+            <button style={styles.button} type="submit">Login</button>
+            <button style={styles.button} type="button" onClick={handleLoginWithPassword}>
+              Login with password?
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
 
 const styles = {
@@ -244,4 +194,3 @@ const styles = {
         position: 'relative' as 'relative',
     },
 };
-

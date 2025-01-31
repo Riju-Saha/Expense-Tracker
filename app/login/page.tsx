@@ -96,11 +96,7 @@ export default function Login() {
 
             <div style={styles.buttonContainer}>
               <button style={styles.button} type="submit">Login</button>
-<<<<<<< HEAD
               <button style={styles.button} onClick={handleLoginWithOtp}>Login with OTP?</button>
-=======
-              <button style={styles.button}>Login with OTP?</button>
->>>>>>> dc4d4717df76e4be1c1568dac4468440e4423f45
             </div>
           </form>
 
