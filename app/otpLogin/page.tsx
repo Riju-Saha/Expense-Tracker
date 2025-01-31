@@ -40,7 +40,6 @@ export default function OtpLogin() {
 
     };
 
-<<<<<<< HEAD
     const handleOtpSent = async (e: React.FormEvent) => {
         e.preventDefault(); // prevent form submission side effects if used within a form
       
@@ -72,9 +71,6 @@ export default function OtpLogin() {
         }
       };
       
-
-=======
->>>>>>> dc4d4717df76e4be1c1568dac4468440e4423f45
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const formData = { name, otp };
@@ -121,14 +117,13 @@ export default function OtpLogin() {
         }
     };
 
-<<<<<<< HEAD
+
     function handleLoginWithPassword() {
         router.push('/login');
     }
 
 
-=======
->>>>>>> dc4d4717df76e4be1c1568dac4468440e4423f45
+
     return (
         <div style={styles.container}>
             <div style={styles.card}>
@@ -155,15 +150,12 @@ export default function OtpLogin() {
                         <div className="mb-3">
                             <TextInput name="Name" value={name} onChange={handleNameChange} />
                         </div>
-<<<<<<< HEAD
                         <div className='mb-2 mt-2' style={{ display: 'flex', justifyContent: 'center' }}>
                             <button style={styles.button} type='button' onClick={handleOtpSent}>Sent Otp</button>
                         </div>
                         <div className="mb-3" style={styles.otp_container}> OTP
-=======
 
                         <div className="mb-3" style={styles.otp_container}> OTP 
->>>>>>> dc4d4717df76e4be1c1568dac4468440e4423f45
                             {otp.map((digit, index) => (
                                 <input
                                     key={index}
@@ -176,19 +168,16 @@ export default function OtpLogin() {
                                     style={styles.otp_input_box}
                                 />
                             ))}
-<<<<<<< HEAD
 
                         </div>
 
                         <div style={styles.buttonContainer}>
                             <button style={styles.button} type="submit">Login</button>
                             <button style={styles.button} type="submit" onClick={handleLoginWithPassword}>Login with password?</button>
-=======
                         </div>
 
                         <div style={{ margin: 'auto', width: '20%' }}>
                             <button style={styles.button} type="submit">Login</button>
->>>>>>> dc4d4717df76e4be1c1568dac4468440e4423f45
                         </div>
                     </form>
                 </div>
@@ -246,7 +235,6 @@ const styles = {
         alignItems: 'center',
         height: '100vh',
     },
-<<<<<<< HEAD
     buttonContainer: {
         display: 'flex',
         justifyContent: 'center', // Center the buttons horizontally
@@ -255,7 +243,5 @@ const styles = {
         width: '100%',
         position: 'relative' as 'relative',
     },
-=======
->>>>>>> dc4d4717df76e4be1c1568dac4468440e4423f45
 };
 
