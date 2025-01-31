@@ -8,15 +8,23 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value);
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => setPhone(e.target.value);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = { name, email, password };
 
+    // Validate phone number before sending to the backend
+    if (!/^\d{10}$/.test(phone)) {
+      alert('Phone number must be exactly 10 digits.');
+      return;
+    }
+
+    const formData = { name, email, password, phone };
     console.log("Form data to submit:", formData);
 
     try {
@@ -31,12 +39,25 @@ export default function Register() {
       if (response.ok) {
         const data = await response.json();
         console.log("Registration successful:", data);
-        alert("Registered sucessfully!")
+        alert("Registered successfully!");
         setName("");
         setEmail("");
         setPassword("");
+        setPhone("");
+        window.location.href = '/login';
       } else {
         const errorData = await response.json();
+        if (errorData.error.includes('name and email')) {
+          alert('The name and email are already registered. Please try another.');
+        } else if (errorData.error.includes('name')) {
+          alert('The name is already registered. Please choose another name.');
+        } else if (errorData.error.includes('email')) {
+          alert('The email is already registered. Please use another email.');
+        } else if (errorData.error.includes('Phone number')) {
+          alert(errorData.error); 
+        } else {
+          alert('Registration failed. Please try again.');
+        }
         console.error("Registration failed:", errorData);
       }
     } catch (err) {
@@ -79,6 +100,10 @@ export default function Register() {
 
               <div className="mb-3">
                 <TextInput name="Password" value={password} onChange={handlePasswordChange} />
+              </div>
+
+              <div className="mb-3">
+                <TextInput name="Phone" value={phone} onChange={handlePhoneChange} />
               </div>
 
               <div style={{ margin: 'auto', width: '20%' }}>

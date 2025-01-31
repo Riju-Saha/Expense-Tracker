@@ -23,6 +23,7 @@ router.post('/login', (req, res) => {
   const { name, password } = req.body;
   const sql = 'SELECT * FROM users WHERE name = ? AND password = ?';
   const values = [name, password];
+  console.log("i got ", values);
 
   connection.query(sql, values, (err, results) => {
     if (err) {
@@ -56,5 +57,25 @@ router.get('/details/:userId', (req, res) => {
     }
   });
 });
+
+router.post('/userCheck', (req, res) => {
+  const { name } = req.body;
+  const sql = 'SELECT * FROM users WHERE name = ?';
+  const values = [name];
+  console.log("i got ", values);
+
+  connection.query(sql, values, (err, results) => {
+    if (err) {
+      console.error('Error executing query:', err.message);
+      return res.status(500).json({ error: 'Database error' });
+    }
+
+    if (results.length > 0) {
+      res.json({ message: 'User exists' });
+    } else {
+      res.status(401).json({ error: 'User dont exists' });
+    }
+  });
+})
 
 module.exports = router;
