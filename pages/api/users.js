@@ -1,6 +1,37 @@
 const express = require('express');
 const connection = require('../../connection');
 const router = express.Router();
+const nodemailer = require('nodemailer');
+
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',  // Using Gmail, you can replace with your provider
+  auth: {
+    user: 'o.56.soumyajit@gmail.com',
+    pass: 'gfbc qiku urfk ecup',
+  },
+});
+
+const sendOtpEmail = (email, otp) => {
+  const mailOptions = {
+    from: 'o.56.soumyajit@gmail.com',  // Sender's email
+    to: email,                    // Recipient's email
+    subject: 'Your OTP Code',     // Subject of the email
+    text: `Your OTP code is: ${otp}`,  // Body of the email
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error);
+    } else {
+      console.log('Email sent:', info.response);
+    }
+  });
+};
+
+
+
+
 
 // Route to register user
 router.post('/register', (req, res) => {
@@ -65,7 +96,7 @@ router.post('/login', (req, res) => {
     if (results.length > 0) {
       res.json({ message: 'Login successful', user: results[0] });
     } else {
-      res.status(401).json({ error: 'Invalid name or password' });
+      res.status(401).json({ error: 'Invalid names or password' });
     }
   });
 });
@@ -90,9 +121,9 @@ router.get('/details/:userId', (req, res) => {
 });
 
 router.post('/userCheck', (req, res) => {
-  const { name } = req.body;
-  const sql = 'SELECT * FROM users WHERE name = ?';
-  const values = [name];
+  const { email } = req.body;
+  const sql = 'SELECT * FROM users WHERE email = ?';
+  const values = [email];
   console.log("i got ", values);
 
   connection.query(sql, values, (err, results) => {
@@ -102,11 +133,42 @@ router.post('/userCheck', (req, res) => {
     }
 
     if (results.length > 0) {
-      res.json({ message: 'User exists' });
+      const verificationCode = Math.floor(100000 + Math.random() * 900000);
+      const sqlUpdate = 'UPDATE users SET otp = ? WHERE email = ?';
+
+      connection.query(sqlUpdate, [verificationCode, email], (err, result) => {
+        if (err) {
+          console.error('Error updating OTP:', err.message);
+          return res.status(500).json({ error: 'Database error' });
+        }
+        sendOtpEmail(email, verificationCode); // Send OTP email
+        res.json({ message: 'OTP updated successfully' });
+ // Send response after OTP update
+      });
     } else {
-      res.status(401).json({ error: 'User dont exists' });
+      res.status(401).json({ error: 'Email does not exist' });
     }
   });
+});
+
+router.post('/otpSent', (req,res) => {
+  const { email, otp } = req.body;
+  const sql = 'SELECT * FROM users WHERE email = ? AND otp = ?';
+  const values = [email, otp];
+  console.log("verification got ", values);
+
+  connection.query(sql, values, (err, results) => {
+    if (err) {
+      console.error('Error executing query:', err.message);
+      return res.status(500).json({ error: 'Database error' });
+    }
+    if (results.length > 0) {
+      const user = results[0];
+      res.json({ message: 'Login successful', user: {id: user.id} });
+    } else {
+      res.status(401).json({ error: 'Invalid name or password' });
+    }
+  })
 })
 
 module.exports = router;

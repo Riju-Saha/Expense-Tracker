@@ -6,7 +6,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000', // Allow requests from your frontend
+  origin: 'http://localhost:3000', // Make sure your frontend is running on this port
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type'],
 }));
@@ -26,13 +26,14 @@ app.get('/', (req, res) => {
   res.send("Hello, the server is running!");
 });
 
+// Use the routes you have defined
 const usersRoutes = require('./pages/api/users'); 
-app.use('/api/users', usersRoutes); 
+app.use('/api/users', usersRoutes);
 
-const transactionsRoutes = require('./pages/api/transactions');
+const transactionsRoutes = require('./pages/api/transactions'); 
 app.use('/api/transactions', transactionsRoutes);
 
-
+// Catch all other routes and return 404
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
