@@ -1,6 +1,5 @@
 'use client'
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import TextInput from '../components/textInput';
 
 
@@ -54,7 +53,7 @@ export default function Register() {
         } else if (errorData.error.includes('email')) {
           alert('The email is already registered. Please use another email.');
         } else if (errorData.error.includes('Phone number')) {
-          alert(errorData.error); 
+          alert(errorData.error);
         } else {
           alert('Registration failed. Please try again.');
         }
@@ -113,8 +112,6 @@ export default function Register() {
           </div>
         </div>
       </div>
-
-
     </>
   );
 }
@@ -148,5 +145,4 @@ const styles = {
     alignItems: 'center',
     height: '100vh',
   }
-
 }

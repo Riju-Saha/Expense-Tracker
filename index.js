@@ -27,10 +27,10 @@ app.get('/', (req, res) => {
 });
 
 // Use the routes you have defined
-const usersRoutes = require('./pages/api/users'); 
+const usersRoutes = require('./pages/api/users');
 app.use('/api/users', usersRoutes);
 
-const transactionsRoutes = require('./pages/api/transactions'); 
+const transactionsRoutes = require('./pages/api/transactions');
 app.use('/api/transactions', transactionsRoutes);
 
 // Catch all other routes and return 404

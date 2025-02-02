@@ -1,11 +1,11 @@
+const nodemailer = require('nodemailer');
 const express = require('express');
 const connection = require('../../connection');
 const router = express.Router();
-const nodemailer = require('nodemailer');
 
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',  // Using Gmail, you can replace with your provider
+  service: 'gmail',
   auth: {
     user: 'o.56.soumyajit@gmail.com',
     pass: 'gfbc qiku urfk ecup',
@@ -143,7 +143,7 @@ router.post('/userCheck', (req, res) => {
         }
         sendOtpEmail(email, verificationCode); // Send OTP email
         res.json({ message: 'OTP updated successfully' });
- // Send response after OTP update
+        // Send response after OTP update
       });
     } else {
       res.status(401).json({ error: 'Email does not exist' });
@@ -151,7 +151,7 @@ router.post('/userCheck', (req, res) => {
   });
 });
 
-router.post('/otpSent', (req,res) => {
+router.post('/otpSent', (req, res) => {
   const { email, otp } = req.body;
   const sql = 'SELECT * FROM users WHERE email = ? AND otp = ?';
   const values = [email, otp];
@@ -164,7 +164,7 @@ router.post('/otpSent', (req,res) => {
     }
     if (results.length > 0) {
       const user = results[0];
-      res.json({ message: 'Login successful', user: {id: user.id} });
+      res.json({ message: 'Login successful', user: { id: user.id } });
     } else {
       res.status(401).json({ error: 'Invalid name or password' });
     }

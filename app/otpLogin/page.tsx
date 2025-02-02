@@ -1,6 +1,5 @@
 'use client'
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import TextInput from '../components/textInput';
 import { useRouter } from 'next/navigation';
 
@@ -14,23 +13,22 @@ export default function OtpLogin() {
   const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const newOtp = [...otp];
     const value = e.target.value;
-  
+
     if (!/^\d?$/.test(value)) return;
-  
+
     newOtp[index] = value;
     setOtp(newOtp);
-  
+
     if (value && index < otp.length - 1) {
       document.getElementById(`otp-input-${index + 1}`)?.focus();
     } else if (!value && index > 0) {
       document.getElementById(`otp-input-${index - 1}`)?.focus();
     }
   };
-  
 
   const handleOtpSent = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (email.trim().length > 1) {
       try {
         const response = await fetch('http://localhost:8000/api/users/userCheck', {
@@ -38,7 +36,7 @@ export default function OtpLogin() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email }),
         });
-  
+
         if (response.ok) {
           const data = await response.json();
           // Wait until OTP is updated before sending the OTP for verification
@@ -56,13 +54,9 @@ export default function OtpLogin() {
       alert('Please provide a valid email address.');
     }
   };
-  
-  
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
-    // Join the OTP digits
     const otpString = otp.join('');
     try {
       const response = await fetch('http://localhost:8000/api/users/otpSent', {
@@ -70,7 +64,7 @@ export default function OtpLogin() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp: otpString }), // Send OTP as string
       });
-  
+
       if (response.ok) {
         const responseJson = await response.json();
         const userId = responseJson.user.id;
@@ -87,7 +81,6 @@ export default function OtpLogin() {
       alert('Error submitting form. Please try again later.');
     }
   };
-  
 
   const handleLoginWithPassword = () => {
     router.push('/login');
@@ -167,7 +160,7 @@ const styles = {
   },
   otp_input_box_focus: {
     borderColor: '#4A90E2',
-  },  
+  },
   button: {
     marginLeft: '10px',
     padding: '10px 20px',

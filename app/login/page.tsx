@@ -1,6 +1,5 @@
 'use client'
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import TextInput from '../components/textInput';
 import { useRouter } from 'next/navigation';
 
@@ -32,10 +31,8 @@ export default function Login() {
         let userId, userName, responseJson;
         try {
           responseJson = await response.json();
-          userId = responseJson.user.id; // ensure backend returns userId as 'user'
+          userId = responseJson.user.id;
           userName = responseJson.user.name;
-          // console.log("the id is ", userId);
-          // console.log("got data ", responseJson.user.name);
         } catch (error) {
           console.error("Error parsing JSON response:", error);
           alert("Error parsing server response. Please try again.");
@@ -99,8 +96,6 @@ export default function Login() {
               <button style={styles.button} onClick={handleLoginWithOtp}>Login with OTP?</button>
             </div>
           </form>
-
-
         </div>
       </div>
     </div>
@@ -120,9 +115,9 @@ const styles = {
   },
   buttonContainer: {
     display: 'flex',
-    justifyContent: 'center', // Center the buttons horizontally
-    gap: '10px', // Add space between the buttons
-    marginTop: '20px', // Add some space above buttons
+    justifyContent: 'center',
+    gap: '10px',
+    marginTop: '20px', 
     width: '100%',
     position: 'relative' as 'relative',
   },
@@ -145,4 +140,3 @@ const styles = {
     height: '100vh',
   }
 };
-
