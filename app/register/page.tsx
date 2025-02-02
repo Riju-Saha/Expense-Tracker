@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import TextInput from '../components/textInput';
 
-
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

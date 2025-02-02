@@ -29,10 +29,6 @@ const sendOtpEmail = (email, otp) => {
   });
 };
 
-
-
-
-
 // Route to register user
 router.post('/register', (req, res) => {
   const { name, email, password, phone } = req.body;
@@ -79,12 +75,11 @@ router.post('/register', (req, res) => {
   });
 });
 
-
 // Route to login user
 router.post('/login', (req, res) => {
-  const { name, password } = req.body;
-  const sql = 'SELECT * FROM users WHERE name = ? AND password = ?';
-  const values = [name, password];
+  const { email, password } = req.body;
+  const sql = 'SELECT * FROM users WHERE email = ? AND password = ?';
+  const values = [email, password];
   console.log("i got ", values);
 
   connection.query(sql, values, (err, results) => {
@@ -94,9 +89,10 @@ router.post('/login', (req, res) => {
     }
 
     if (results.length > 0) {
-      res.json({ message: 'Login successful', user: results[0] });
+      const user = results[0];
+      res.json({ message: 'Login successful', user: { email: user.email, id: user.id } });
     } else {
-      res.status(401).json({ error: 'Invalid names or password' });
+      res.status(401).json({ error: 'Invalid email or password' });
     }
   });
 });

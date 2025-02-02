@@ -7,7 +7,8 @@ const app = express();
 // Middleware
 app.use(cors({
   origin: 'http://localhost:3000', // Make sure your frontend is running on this port
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
   allowedHeaders: ['Content-Type'],
 }));
 app.use(bodyParser.json());
