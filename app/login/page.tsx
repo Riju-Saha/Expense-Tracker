@@ -5,18 +5,16 @@ import { useRouter } from 'next/navigation';
 
 
 export default function Login() {
-  // const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [Email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  // const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value);
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = { email, password };
+    const formData = { Email, password };
 
     console.log("Form data to submit:", formData);
 
@@ -34,7 +32,7 @@ export default function Login() {
         try {
           responseJson = await response.json();
           userId = responseJson.user.id;
-          userEmail = responseJson.user.email;
+          userEmail = responseJson.user.Email;
           // console.log(responseJson);
         } catch (error) {
           console.error("Error parsing JSON response:", error);
@@ -59,7 +57,7 @@ export default function Login() {
     }
   };
 
-  function handleLoginWithOtp() {
+  const handleLoginWithOtp = () => {
     router.push('/otpLogin');
   }
 
@@ -87,11 +85,11 @@ export default function Login() {
           <h3 className="card-title text-center mb-4" style={{ fontSize: '22px' }}>Login</h3>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <TextInput name="Email" value={email} onChange={handleEmailChange} />
+              <TextInput name="Email" type="email" value={Email} onChange={handleEmailChange} />
             </div>
 
             <div className="mb-3">
-              <TextInput name="Password" value={password} onChange={handlePasswordChange} />
+              <TextInput name="Password" type="password" value={password} onChange={handlePasswordChange} />
             </div>
 
             <div style={styles.buttonContainer}>
@@ -120,7 +118,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     gap: '10px',
-    marginTop: '20px', 
+    marginTop: '20px',
     width: '100%',
     position: 'relative' as 'relative',
   },

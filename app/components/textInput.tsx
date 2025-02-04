@@ -5,15 +5,16 @@ interface TextInputProps {
   name: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  type: string;
 }
 
-const TextInput: React.FC<TextInputProps> = ({ name, value, onChange }) => {
+const TextInput: React.FC<TextInputProps> = ({ name, value, type, onChange }) => {
   return (
     <StyledWrapper>
       <div className="input-group">
         <input
           required
-          type="text"
+          type={type}
           name={name}
           value={value}
           onChange={onChange}

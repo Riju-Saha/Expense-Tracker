@@ -4,7 +4,7 @@ import TextInput from '../components/textInput';
 
 export default function Register() {
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [Email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
 
@@ -22,7 +22,7 @@ export default function Register() {
       return;
     }
 
-    const formData = { name, email, password, phone };
+    const formData = { name, Email, password, phone };
     console.log("Form data to submit:", formData);
 
     try {
@@ -45,12 +45,12 @@ export default function Register() {
         window.location.href = '/login';
       } else {
         const errorData = await response.json();
-        if (errorData.error.includes('name and email')) {
-          alert('The name and email are already registered. Please try another.');
+        if (errorData.error.includes('name and Email')) {
+          alert('The name and Email are already registered. Please try another.');
         } else if (errorData.error.includes('name')) {
           alert('The name is already registered. Please choose another name.');
-        } else if (errorData.error.includes('email')) {
-          alert('The email is already registered. Please use another email.');
+        } else if (errorData.error.includes('Email')) {
+          alert('The Email is already registered. Please use another Email.');
         } else if (errorData.error.includes('Phone number')) {
           alert(errorData.error);
         } else {
@@ -89,19 +89,19 @@ export default function Register() {
             <h3 className="card-title text-center mb-4">Register</h3>
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
-                <TextInput name="Name" value={name} onChange={handleNameChange} />
+                <TextInput name="Name" type="text" value={name} onChange={handleNameChange} />
               </div>
 
               <div className="mb-3">
-                <TextInput name="Email" value={email} onChange={handleEmailChange} />
+                <TextInput name="Email" type="email" value={Email} onChange={handleEmailChange} />
               </div>
 
               <div className="mb-3">
-                <TextInput name="Password" value={password} onChange={handlePasswordChange} />
+                <TextInput name="Password" type="password" value={password} onChange={handlePasswordChange} />
               </div>
 
               <div className="mb-3">
-                <TextInput name="Phone" value={phone} onChange={handlePhoneChange} />
+                <TextInput name="Phone" type="text" value={phone} onChange={handlePhoneChange} />
               </div>
 
               <div style={{ margin: 'auto', width: '20%' }}>

@@ -6,12 +6,4 @@ const connection = mysql.createConnection({
     database: 'expense_tracker_db'
 });
 
-// connection.connect((err) => {
-//     if (err) {
-//         console.error('Error connecting to the database');
-//         return;
-//     }
-//     console.log('Connected to the database');
-// });
-
 module.exports = connection;
