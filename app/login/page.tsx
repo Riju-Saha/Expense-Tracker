@@ -85,7 +85,7 @@ export default function Login() {
           <h3 className="card-title text-center mb-4" style={{ fontSize: '22px' }}>Login</h3>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <TextInput name="Email" value={email}  onChange={handleemailChange} />
+              <TextInput name="Email" value={email} onChange={handleemailChange} />
             </div>
 
             <div className="mb-3">

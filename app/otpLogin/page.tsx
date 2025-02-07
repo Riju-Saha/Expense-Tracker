@@ -185,7 +185,7 @@ const styles = {
   },
   container: {
     backgroundColor: '#121212',
-    color: '#e8e8e8', 
+    color: '#e8e8e8',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',

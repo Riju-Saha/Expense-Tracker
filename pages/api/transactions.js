@@ -42,39 +42,39 @@ router.post('/', (req, res) => {
     });
   });
 });
-  
-  // Route to fetch transactions for a user
-  router.get('/:user_id', (req, res) => {
-    const { user_id } = req.params;
-  
-    const sql = 'SELECT * FROM transactions WHERE user_id = ? ORDER BY date DESC, time DESC';
-    
-    connection.query(sql, [user_id], (err, result) => {
-      if (err) {
-        console.error('Error fetching transactions:', err.message);
-        return res.status(500).json({ error: 'Database error' });
-      }
-  
-      res.status(200).json(result);
-    });
+
+// Route to fetch transactions for a user
+router.get('/:user_id', (req, res) => {
+  const { user_id } = req.params;
+
+  const sql = 'SELECT * FROM transactions WHERE user_id = ? ORDER BY date DESC, time DESC';
+
+  connection.query(sql, [user_id], (err, result) => {
+    if (err) {
+      console.error('Error fetching transactions:', err.message);
+      return res.status(500).json({ error: 'Database error' });
+    }
+
+    res.status(200).json(result);
   });
-  
-  router.delete('/:transactionId', (req, res) => {
-    const { transactionId } = req.params;
-  
-    const deleteSql = 'DELETE FROM transactions WHERE id = ?';
-    connection.query(deleteSql, [transactionId], (err, result) => {
-      if (err) {
-        console.error('Error deleting transaction:', err.message);
-        return res.status(500).json({ error: 'Database error' });
-      }
-  
-      if (result.affectedRows === 0) {
-        return res.status(404).json({ error: 'Transaction not found' });
-      }
-  
-      res.status(200).json({ message: 'Transaction deleted successfully' });
-    });
+});
+
+router.delete('/:transactionId', (req, res) => {
+  const { transactionId } = req.params;
+
+  const deleteSql = 'DELETE FROM transactions WHERE id = ?';
+  connection.query(deleteSql, [transactionId], (err, result) => {
+    if (err) {
+      console.error('Error deleting transaction:', err.message);
+      return res.status(500).json({ error: 'Database error' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Transaction not found' });
+    }
+
+    res.status(200).json({ message: 'Transaction deleted successfully' });
   });
-  
-  module.exports = router;
+});
+
+module.exports = router;
