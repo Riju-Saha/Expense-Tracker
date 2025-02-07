@@ -1,8 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { FaTrashAlt } from 'react-icons/fa';
+import axios, { AxiosResponse } from 'axios';
 
 interface TransactionProps {
   userId: string;
 }
+
+interface Transaction {
+  id: number;
+  user_id: string;
+  user_name: string;
+  amount: number;
+  type: 'credit' | 'debit';
+  title: string;
+  date: string;
+  time: string;
+}
+
 
 const Transaction: React.FC<TransactionProps> = ({ userId }) => {
   const [amount, setAmount] = useState('');
@@ -11,15 +25,14 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
 
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [error, setError] = useState<string | null>(null);
-
-  const [filteredTransactions, setFilteredTransactions] = useState<any[]>([]);
+  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
 
   const [selectedDate, setSelectedDate] = useState<string>('');
-
-  const [sortConfig, setSortConfig] = useState<{ key: string, direction: string }>({
-    key: 'date', direction: 'asc',
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: string }>({
+    key: 'date',
+    direction: 'asc',
   });
 
   // Function to get current date and time in IST
@@ -58,15 +71,9 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/transactions/${userId}`);
-        if (response.ok) {
-          const data = await response.json();
-          setTransactions(data);
-          setFilteredTransactions(data); // Set default filtered list to all transactions
-        } else {
-          const errorData = await response.json();
-          setError(errorData.error || 'Failed to fetch transactions');
-        }
+        const response = await axios.get(`http://localhost:8000/api/transactions/${userId}`);
+        setTransactions(response.data);
+        setFilteredTransactions(response.data); // Set default filtered list to all transactions
       } catch (err) {
         setError('An error occurred while fetching transactions');
       }
@@ -108,35 +115,25 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
     };
 
     try {
-      const response = await fetch('http://localhost:8000/api/transactions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(transactionData),
-      });
+      const response = await axios.post('http://localhost:8000/api/transactions', transactionData);
 
-      if (response.ok) {
+      if (response.status === 200) {
         setAmount('');
         setTransactionType('credit');
         setTitle('');
 
-        const updatedTransactions = await fetch(
-          `http://localhost:8000/api/transactions/${userId}`
-        );
-        const data = await updatedTransactions.json();
-        setTransactions(data);
-        setFilteredTransactions(data);
+        const updatedTransactions = await axios.get(`http://localhost:8000/api/transactions/${userId}`);
+        setTransactions(updatedTransactions.data);
+        setFilteredTransactions(updatedTransactions.data);
       } else {
-        const errorData = await response.json();
-        console.error('Error adding transaction:', errorData.error);
+        setError('Failed to add transaction');
       }
     } catch (error) {
-      console.error('Error adding transaction:', error);
+      setError('Error adding transaction');
     }
   };
 
-  const handleSort = (key: string) => {
+  const handleSort = (key: keyof Transaction) => {
     const newDirection = sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc';
     setSortConfig({ key, direction: newDirection });
 
@@ -150,6 +147,25 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
     });
 
     setFilteredTransactions(sortedTransactions);
+  };
+
+
+  const handleDelete = (transactionId: number) => {
+    // Remove transaction from frontend state
+    setFilteredTransactions((prevTransactions) =>
+      prevTransactions.filter((transaction) => transaction.id !== transactionId)
+    );
+
+    // Delete the transaction from the backend
+    axios
+      .delete(`http://localhost:8000/api/transactions/${transactionId}`)
+      .then((response: AxiosResponse) => {
+        console.log('Transaction deleted successfully:', response.data);
+      })
+      .catch((error) => {
+        console.error('Error deleting transaction:', error);
+        // Optionally revert frontend state if there is an error
+      });
   };
 
   return (
@@ -229,10 +245,7 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
                 >
                   Type
                 </th>
-                <th
-
-                  className="p-4 border border-gray-700 text-left text-center cursor-pointer"
-                >
+                <th className="p-4 border border-gray-700 text-left text-center cursor-pointer">
                   Title
                 </th>
                 <th
@@ -241,16 +254,17 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
                 >
                   Date
                 </th>
-                <th
-                  className="p-4 border border-gray-700 text-left text-center cursor-pointer"
-                >
+                <th className="p-4 border border-gray-700 text-left text-center cursor-pointer">
                   Time
+                </th>
+                <th className="p-4 border border-gray-700 text-left text-center">
+                  Action
                 </th>
               </tr>
             </thead>
             <tbody>
               {filteredTransactions.length > 0 ? (
-                filteredTransactions.map((transaction: any, index: number) => (
+                filteredTransactions.map((transaction: Transaction, index: number) => (
                   <tr
                     key={transaction.id}
                     className={`text-center ${index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-700'}`}
@@ -273,12 +287,20 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
                       })()}
                     </td>
                     <td className="p-4 border border-gray-700">{transaction.time}</td>
+                    <td className="p-4 border border-gray-700">
+                      <button
+                        onClick={() => handleDelete(transaction.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <FaTrashAlt />
+                      </button>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     className="p-4 text-center border border-gray-700 bg-gray-800"
                   >
                     No transactions found.
@@ -286,6 +308,7 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
                 </tr>
               )}
             </tbody>
+
           </table>
         </div>
       </div>

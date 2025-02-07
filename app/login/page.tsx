@@ -5,16 +5,16 @@ import { useRouter } from 'next/navigation';
 
 
 export default function Login() {
-  const [Email, setEmail] = useState("");
+  const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
+  const handleemailChange = (e: React.ChangeEvent<HTMLInputElement>) => setemail(e.target.value);
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = { Email, password };
+    const formData = { email, password };
 
     console.log("Form data to submit:", formData);
 
@@ -28,11 +28,11 @@ export default function Login() {
       });
 
       if (response.ok) {
-        let responseJson, userId, userEmail;
+        let responseJson, userId, useremail;
         try {
           responseJson = await response.json();
           userId = responseJson.user.id;
-          userEmail = responseJson.user.Email;
+          useremail = responseJson.user.email;
           // console.log(responseJson);
         } catch (error) {
           console.error("Error parsing JSON response:", error);
@@ -41,7 +41,7 @@ export default function Login() {
         }
 
         console.log("Login successful:", userId);
-        setEmail("");
+        setemail("");
         setPassword("");
         alert("Login successful!");
 
@@ -85,11 +85,11 @@ export default function Login() {
           <h3 className="card-title text-center mb-4" style={{ fontSize: '22px' }}>Login</h3>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <TextInput name="Email" type="email" value={Email} onChange={handleEmailChange} />
+              <TextInput name="Email" value={email}  onChange={handleemailChange} />
             </div>
 
             <div className="mb-3">
-              <TextInput name="Password" type="password" value={password} onChange={handlePasswordChange} />
+              <TextInput name="Password" value={password} onChange={handlePasswordChange} />
             </div>
 
             <div style={styles.buttonContainer}>

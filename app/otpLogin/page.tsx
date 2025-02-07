@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React, { useState } from 'react';
 import TextInput from '../components/textInput';
 import { useRouter } from 'next/navigation';
@@ -38,8 +38,6 @@ export default function OtpLogin() {
         });
 
         if (response.ok) {
-          const data = await response.json();
-          // Wait until OTP is updated before sending the OTP for verification
           setOtp(['', '', '', '', '', '']);
           alert('Check your email for the OTP.');
         } else {
@@ -58,11 +56,12 @@ export default function OtpLogin() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const otpString = otp.join('');
+
     try {
       const response = await fetch('http://localhost:8000/api/users/otpSent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp: otpString }), // Send OTP as string
+        body: JSON.stringify({ email, otp: otpString }),
       });
 
       if (response.ok) {
@@ -74,7 +73,11 @@ export default function OtpLogin() {
         router.push(`/${userId}`);
       } else {
         const errorData = await response.json();
-        alert('Login failed: ' + errorData.error);
+        if (errorData.error === 'Invalid OTP') {
+          alert('Incorrect OTP, check again.');
+        } else {
+          alert('Login failed: ' + errorData.error);
+        }
       }
     } catch (err) {
       console.error('Error submitting form:', err);
@@ -124,7 +127,6 @@ export default function OtpLogin() {
                 style={styles.otp_input_box}
                 aria-label={`OTP Digit ${index + 1}`}
               />
-
             ))}
           </div>
           <div style={styles.buttonContainer}>
@@ -172,8 +174,8 @@ const styles = {
     fontSize: '16px',
   },
   card: {
-    backgroundColor: '#212121', // Dark background for the card
-    color: '#f5f5f5', // Light text color
+    backgroundColor: '#212121',
+    color: '#f5f5f5',
     borderRadius: '10px',
     boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
     width: '100%',
@@ -182,8 +184,8 @@ const styles = {
     margin: '0 20px',
   },
   container: {
-    backgroundColor: '#121212', // Darker background for the container
-    color: '#e8e8e8', // Light text color   
+    backgroundColor: '#121212',
+    color: '#e8e8e8', 
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -191,9 +193,9 @@ const styles = {
   },
   buttonContainer: {
     display: 'flex',
-    justifyContent: 'center', // Center the buttons horizontally
-    gap: '10px', // Add space between the buttons
-    marginTop: '20px', // Add some space above buttons
+    justifyContent: 'center',
+    gap: '10px',
+    marginTop: '20px',
     width: '100%',
     position: 'relative' as 'relative',
   },
