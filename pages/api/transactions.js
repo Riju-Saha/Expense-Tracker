@@ -4,7 +4,7 @@ const connection = require('../../connection');
 
 // Route to handle inserting transactions
 router.post('/', (req, res) => {
-  const { user_id, amount, type, title, date, time } = req.body;
+  const { user_id, amount, type, title, date, time, status } = req.body;
   console.log("info i recieved in backend");
   console.log(req.body);
 
@@ -27,10 +27,10 @@ router.post('/', (req, res) => {
     const user_name = results[0].name;
 
     const insertSql = `
-      INSERT INTO transactions (user_id, user_name, amount, type, title, date, time)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+  INSERT INTO transactions (user_id, user_name, amount, type, title, date, time, status)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const values = [user_id, user_name, amount, type, title, date, time];
+    const values = [user_id, user_name, amount, type, title, date, time, status];
 
     connection.query(insertSql, values, (err, result) => {
       if (err) {

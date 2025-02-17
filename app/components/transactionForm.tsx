@@ -11,6 +11,7 @@ interface Transaction {
   user_id: string;
   user_name: string;
   amount: number;
+  status: 'paid' | 'unpaid' | 'partially paid';
   type: 'credit' | 'debit';
   title: string;
   date: string;
@@ -20,7 +21,8 @@ interface Transaction {
 
 const Transaction: React.FC<TransactionProps> = ({ userId }) => {
   const [amount, setAmount] = useState('');
-  const [transactionType, setTransactionType] = useState('credit');
+  const [transactionType, setTransactionType] = useState('');
+  const [paymentStatus, setPaymentStatus] = useState('');  
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
@@ -67,18 +69,18 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
     return () => clearInterval(interval); // Cleanup interval on component unmount
   }, []);
 
-  // Fetch transactions when the component loads
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/api/transactions/${userId}`);
+        console.log(response.data); // Add this line to check if `status` is coming correctly
         setTransactions(response.data);
         setFilteredTransactions(response.data); // Set default filtered list to all transactions
       } catch (err) {
         setError('An error occurred while fetching transactions');
       }
     };
-
+  
     fetchTransactions();
   }, [userId]);
 
@@ -108,6 +110,7 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
     const transactionData = {
       user_id: userId,
       amount,
+      status: paymentStatus, 
       type: transactionType,
       title,
       date: formattedDate,
@@ -119,7 +122,8 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
 
       if (response.status === 200) {
         setAmount('');
-        setTransactionType('credit');
+        setTransactionType('');
+        setPaymentStatus('');
         setTitle('');
 
         const updatedTransactions = await axios.get(`http://localhost:8000/api/transactions/${userId}`);
@@ -151,21 +155,24 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
 
 
   const handleDelete = (transactionId: number) => {
-    // Remove transaction from frontend state
-    setFilteredTransactions((prevTransactions) =>
-      prevTransactions.filter((transaction) => transaction.id !== transactionId)
-    );
+    if (confirm("Delete the transaction?") == true) {
+      // Remove transaction from frontend state
+      setFilteredTransactions((prevTransactions) =>
+        prevTransactions.filter((transaction) => transaction.id !== transactionId)
+      );
 
-    // Delete the transaction from the backend
-    axios
-      .delete(`http://localhost:8000/api/transactions/${transactionId}`)
-      .then((response: AxiosResponse) => {
-        console.log('Transaction deleted successfully:', response.data);
-      })
-      .catch((error) => {
-        console.error('Error deleting transaction:', error);
-        // Optionally revert frontend state if there is an error
-      });
+      // Delete the transaction from the backend
+      axios
+        .delete(`http://localhost:8000/api/transactions/${transactionId}`)
+        .then((response: AxiosResponse) => {
+          console.log('Transaction deleted successfully:', response.data);
+        })
+        .catch((error) => {
+          console.error('Error deleting transaction:', error);
+        });
+    } else {
+      // do nothing
+    }
   };
 
   return (
@@ -182,11 +189,23 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
             onChange={(e) => setAmount(e.target.value)}
             className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded text-sm lg:text-base"
           />
+  
+          <select
+            value={paymentStatus}
+            onChange={(e) => setPaymentStatus(e.target.value)}
+            className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded text-sm lg:text-base" required
+          >
+            <option value="" disabled>Select payment status</option>
+            <option value="Paid">Paid</option>
+            <option value="Unpaid">Unpaid</option>
+            <option value="Partially Paid">Partially paid</option>
+          </select>
           <select
             value={transactionType}
             onChange={(e) => setTransactionType(e.target.value)}
-            className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded text-sm lg:text-base"
+            className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded text-sm lg:text-base" required
           >
+            <option value="" disabled>Select payment type</option>
             <option value="credit">Credit</option>
             <option value="debit">Debit</option>
           </select>
@@ -257,6 +276,14 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
                 <th className="p-4 border border-gray-700 text-left text-center cursor-pointer">
                   Time
                 </th>
+
+                <th
+                  onClick={() => handleSort('status')}
+                  className="p-4 border border-gray-700 text-left text-center cursor-pointer"
+                >
+                  Status
+                </th>
+
                 <th className="p-4 border border-gray-700 text-left text-center">
                   Action
                 </th>
@@ -287,6 +314,7 @@ const Transaction: React.FC<TransactionProps> = ({ userId }) => {
                       })()}
                     </td>
                     <td className="p-4 border border-gray-700">{transaction.time}</td>
+                    <td className="p-4 border border-gray-700">{transaction.status}</td>
                     <td className="p-4 border border-gray-700">
                       <button
                         onClick={() => handleDelete(transaction.id)}
