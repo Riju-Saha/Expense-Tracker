@@ -59,6 +59,22 @@ router.get('/:user_id', (req, res) => {
   });
 });
 
+router.put('/:transaction_id', (req,res) => {
+  const { amount, status, type, title } = req.body;
+  const { transaction_id } = req.params;
+
+  const sql = 'UPDATE transactions SET amount = ?, status = ?, type = ?, title = ? WHERE id = ?'
+  
+  connection.query(sql, [amount, status, type, title, transaction_id], (err, result) => {
+    if (err) {
+      console.error('Error updating transaction:', err.message);
+      return res.status(500).json({ error: 'Database error' });
+    }
+
+    res.status(200).json({ message: 'Transaction updated successfully' });
+  });
+});
+
 router.delete('/:transactionId', (req, res) => {
   const { transactionId } = req.params;
 

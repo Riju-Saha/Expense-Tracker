@@ -43,6 +43,8 @@ const TransactionComponent: React.FC<TransactionProps> = ({ userId }) => {
       const response = await axios.get(`http://localhost:8000/api/transactions/${userId}`);
       setTransactions(response.data);
       setFilteredTransactions(response.data);
+      // console.log("transactions fetched"+transactions)
+      // console.log("transactions also fetched"+filteredTransactions)
     } catch (err) {
       setError('An error occurred while fetching transactions');
     }
@@ -51,6 +53,35 @@ const TransactionComponent: React.FC<TransactionProps> = ({ userId }) => {
   useEffect(() => {
     fetchTransactions();
   }, [userId]);
+
+
+  // Handle Edit submission
+  const handleUpdate = async (e: React.FormEvent) => {
+    const transactionData = {
+      // user_id: userId,
+      transaction_id: transactionId,
+      amount,
+      status: paymentStatus,
+      type: transactionType,
+      title
+    };
+    try {
+      const response = await axios.put(`http://localhost:8000/api/transactions/${transactionId}`, transactionData);
+
+      if (response.status === 200) {
+        setAmount('');
+        setTransactionType('');
+        setPaymentStatus('');
+        setTitle('');
+        fetchTransactions();
+        setIsEditing(false);
+      } else {
+        setError('Failed to add transaction');
+      }
+    } catch (error) {
+      setError('Error adding transaction');
+    }
+  }
 
   // Handle Form Submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,6 +95,7 @@ const TransactionComponent: React.FC<TransactionProps> = ({ userId }) => {
 
     const transactionData = {
       user_id: userId,
+      transaction_id: transactionId,
       amount,
       status: paymentStatus,
       type: transactionType,
@@ -133,19 +165,23 @@ const TransactionComponent: React.FC<TransactionProps> = ({ userId }) => {
       <div className="w-full lg:w-2/5 p-6 bg-gray-800">
         <h2 className="text-white text-xl mb-4">Transaction Form</h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={(e) => { e.preventDefault(); editing ? handleUpdate(e) : handleSubmit(e);}} className='space-y-4'>
+
           <input type="number" placeholder="Amount" value={amount} onChange={(e) => setAmount(e.target.value)} className="w-full p-2 bg-gray-700 text-white rounded" required />
+
           <select value={paymentStatus} onChange={(e) => setPaymentStatus(e.target.value)} className="w-full p-2 bg-gray-700 text-white rounded" required>
             <option value="" disabled>Select payment status</option>
             <option value="Paid">Paid</option>
             <option value="Unpaid">Unpaid</option>
             <option value="Partially Paid">Partially paid</option>
           </select>
+
           <select value={transactionType} onChange={(e) => setTransactionType(e.target.value)} className="w-full p-2 bg-gray-700 text-white rounded" required>
             <option value="" disabled>Select payment type</option>
             <option value="credit">Credit</option>
             <option value="debit">Debit</option>
           </select>
+
           <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full p-2 bg-gray-700 text-white rounded" required />
           <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded">{editing ? 'Update' : 'Submit'}</button>
           {editing && (
