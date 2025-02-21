@@ -44,7 +44,7 @@ export default function UserPage() {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto px-4 py-6 bg-gray-900">
+      <div className="container mx-auto px-4 py-6 bg-gray-900 text-white text-center md:text-left bg-gray-900">
         <h1 className="text-2xl font-bold">
           Welcome, {userName || `User ${userId}`}!
         </h1>

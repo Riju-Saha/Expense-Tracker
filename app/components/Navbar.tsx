@@ -22,21 +22,6 @@ export default function Navbar() {
             Expense Tracker
           </a>
 
-          {/* <div className="hidden lg:flex lg:items-center lg:space-x-4">
-            <a
-              className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-              href="#"
-              aria-current="page"
-            >
-              Transactions
-            </a>
-            <a
-              className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-              href="#"
-            >
-              Balance
-            </a>
-          </div> */}
         </div>
 
         {/* Logout button */}
@@ -83,23 +68,6 @@ export default function Navbar() {
           id="navbarSupportedContent"
         >
           <ul className="flex flex-col space-y-2">
-            <li>
-              <a
-                className="block px-4 py-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-                href="#"
-                aria-current="page"
-              >
-                Home
-              </a>
-            </li>
-            <li>
-              <a
-                className="block px-4 py-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-                href="#"
-              >
-                Link
-              </a>
-            </li>
             <li>
               <button
                 onClick={handleLogout}
