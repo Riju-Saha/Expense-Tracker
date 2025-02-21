@@ -32,17 +32,58 @@ const TransactionComponent: React.FC<TransactionProps> = ({ userId }) => {
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const [sortConfig, setSortConfig] = useState<{ key: keyof Transaction; direction: string }>({
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: string }>({
     key: 'date',
     direction: 'asc',
   });
+
+  // Function to get current date and time in IST
+  const updateDateTime = (): void => {
+    if (editing) return; // Prevent updates when editing
+  
+    const dateInUTC = new Date();
+    const dateOptions: Intl.DateTimeFormatOptions = {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    };
+    const timeOptions: Intl.DateTimeFormatOptions = {
+      timeZone: 'Asia/Kolkata',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    };
+  
+    const formattedDate = dateInUTC.toLocaleDateString('en-IN', dateOptions);
+    const formattedTime = dateInUTC.toLocaleTimeString('en-IN', timeOptions);
+  
+    const [day, month, year] = formattedDate.split('/');
+    const [hours, minutes] = formattedTime.split(':');
+  
+    setDate(`${year}-${month}-${day}`);
+    setTime(`${hours}:${minutes}`);
+  };
+  
+  useEffect(() => {
+    if (!editing) {
+      updateDateTime();
+      const interval = setInterval(updateDateTime, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [editing]);
+  
+  
+
+
 
   // Fetch Transactions
   const fetchTransactions = async () => {
     try {
       const response = await axios.get(`http://localhost:8000/api/transactions/${userId}`);
       setTransactions(response.data);
-      setFilteredTransactions(response.data);
+      setFilteredTransactions(response.data); // Set default filtered list to all transactions
       // console.log("transactions fetched"+transactions)
       // console.log("transactions also fetched"+filteredTransactions)
     } catch (err) {
@@ -57,29 +98,31 @@ const TransactionComponent: React.FC<TransactionProps> = ({ userId }) => {
 
   // Handle Edit submission
   const handleUpdate = async (e: React.FormEvent) => {
-    const transactionData = {
-      // user_id: userId,
-      transaction_id: transactionId,
-      amount,
-      status: paymentStatus,
-      type: transactionType,
-      title
-    };
-    try {
-      const response = await axios.put(`http://localhost:8000/api/transactions/${transactionId}`, transactionData);
+    if (confirm("Update the transaction?")) {
+      const transactionData = {
+        // user_id: userId,
+        transaction_id: transactionId,
+        amount,
+        status: paymentStatus,
+        type: transactionType,
+        title
+      };
+      try {
+        const response = await axios.put(`http://localhost:8000/api/transactions/${transactionId}`, transactionData);
 
-      if (response.status === 200) {
-        setAmount('');
-        setTransactionType('');
-        setPaymentStatus('');
-        setTitle('');
-        fetchTransactions();
-        setIsEditing(false);
-      } else {
-        setError('Failed to add transaction');
+        if (response.status === 200) {
+          setAmount('');
+          setTransactionType('');
+          setPaymentStatus('');
+          setTitle('');
+          fetchTransactions();
+          setIsEditing(false);
+        } else {
+          setError('Failed to add transaction');
+        }
+      } catch (error) {
+        setError('Error adding transaction');
       }
-    } catch (error) {
-      setError('Error adding transaction');
     }
   }
 
@@ -87,11 +130,25 @@ const TransactionComponent: React.FC<TransactionProps> = ({ userId }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const formattedDate = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-    const formattedTime = new Date().toLocaleTimeString("en-IN", { hour12: false }); // HH:mm:ss
+    const dateInUTC = new Date();
+    const dateOptions: Intl.DateTimeFormatOptions = {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    };
+    const formattedDate = dateInUTC.toLocaleDateString('en-CA', dateOptions).toString().split('T')[0];
 
-    setDate(formattedDate);
-    setTime(formattedTime);
+    const timeOptions: Intl.DateTimeFormatOptions = {
+      timeZone: 'Asia/Kolkata',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    };
+    const formattedTime = dateInUTC.toLocaleTimeString('en-GB', timeOptions);
+
+    setDate(formattedDate); // YYYY-MM-DD
+    setTime(formattedTime); // HH:mm
 
     const transactionData = {
       user_id: userId,
@@ -136,15 +193,18 @@ const TransactionComponent: React.FC<TransactionProps> = ({ userId }) => {
 
   // Handle Edit
   const handleEdit = (id: number, amt: number, type: string, title: string, date: string, time: string, status: string) => {
+    const formattedDate = date.split('T')[0]; 
+  
     setTransactionId(id);
     setAmount(String(amt));
     setTransactionType(type);
     setTitle(title);
-    setDate(date);
+    setDate(formattedDate); 
     setTime(time);
     setPaymentStatus(status);
     setIsEditing(true);
   };
+  
 
   // Handle Sorting
   const handleSort = (key: keyof Transaction) => {
@@ -165,7 +225,7 @@ const TransactionComponent: React.FC<TransactionProps> = ({ userId }) => {
       <div className="w-full lg:w-2/5 p-6 bg-gray-800">
         <h2 className="text-white text-xl mb-4">Transaction Form</h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
-        <form onSubmit={(e) => { e.preventDefault(); editing ? handleUpdate(e) : handleSubmit(e);}} className='space-y-4'>
+        <form onSubmit={(e) => { e.preventDefault(); editing ? handleUpdate(e) : handleSubmit(e); }} className='space-y-4'>
 
           <input type="number" placeholder="Amount" value={amount} onChange={(e) => setAmount(e.target.value)} className="w-full p-2 bg-gray-700 text-white rounded" required />
 
@@ -181,6 +241,11 @@ const TransactionComponent: React.FC<TransactionProps> = ({ userId }) => {
             <option value="credit">Credit</option>
             <option value="debit">Debit</option>
           </select>
+
+          <div className="flex space-x-4">
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="p-2 bg-gray-700 text-white border border-gray-600 rounded text-sm lg:text-base" />
+            <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="p-2 bg-gray-700 text-white border border-gray-600 rounded text-sm lg:text-base" />
+          </div>
 
           <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full p-2 bg-gray-700 text-white rounded" required />
           <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded">{editing ? 'Update' : 'Submit'}</button>
@@ -212,21 +277,26 @@ const TransactionComponent: React.FC<TransactionProps> = ({ userId }) => {
           <thead>
             <tr>
               {['ID', 'Amount', 'Type', 'Title', 'Date', 'Time', 'Status', 'Action'].map((col, i) => (
-                <th key={i} className="p-4 border border-gray-700 cursor-pointer" onClick={() => handleSort(col.toLowerCase() as keyof Transaction)}>{col}</th>
+                <th key={i} className="p-4 border border-gray-700 text-center cursor-pointer" onClick={() => handleSort(col.toLowerCase() as keyof Transaction)}>{col}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {filteredTransactions.map((transaction, index) => (
               <tr key={transaction.id} className={`${index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-700'}`}>
-                <td className="p-4 border border-gray-700">{transaction.id}</td>
-                <td className="p-4 border border-gray-700">{transaction.amount}</td>
-                <td className="p-4 border border-gray-700">{transaction.type}</td>
-                <td className="p-4 border border-gray-700">{transaction.title}</td>
-                <td className="p-4 border border-gray-700">{transaction.date}</td>
-                <td className="p-4 border border-gray-700">{transaction.time}</td>
-                <td className="p-4 border border-gray-700">{transaction.status}</td>
-                <td className="p-4 border border-gray-700 flex gap-4">
+                <td className="p-4 border border-gray-700 text-center">{transaction.id}</td>
+                <td className="p-4 border border-gray-700 text-center">{transaction.amount}</td>
+                <td className="p-4 border border-gray-700 text-center">{transaction.type}</td>
+                <td className="p-4 border border-gray-700 text-center">{transaction.title}</td>
+                <td className="p-4 border border-gray-700 text-center">
+                  {(() => {
+                    const dateParts = transaction.date.split('T')[0].split('-');
+                    return `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+                  })()}
+                </td>
+                <td className="p-4 border border-gray-700 text-center">{transaction.time.slice(0, 5)}</td>
+                <td className="p-4 border border-gray-700 text-center">{transaction.status}</td>
+                <td className="p-4 border border-gray-700 text-center flex gap-4">
                   <button onClick={() => handleDelete(transaction.id)} className="text-red-500"><FaTrashAlt /></button>
                   <button onClick={() => handleEdit(transaction.id, transaction.amount, transaction.type, transaction.title, transaction.date, transaction.time, transaction.status)} className="text-blue-500"><FaEdit /></button>
                 </td>
