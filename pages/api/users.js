@@ -2,7 +2,16 @@ const nodemailer = require('nodemailer');
 const express = require('express');
 const connection = require('../../connection');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
+const mysql = require('mysql2');
+const cors = require('cors');
+router.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}));
 
+
+const SECRET_KEY = 'rijudona';
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -90,31 +99,79 @@ router.post('/login', (req, res) => {
 
     if (results.length > 0) {
       const user = results[0];
-      res.json({ message: 'Login successful', user: { email: user.email, id: user.id } });
+
+      const token = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: '1h' }); //token created for that id
+      console.log("from backend token is ", token);
+      res.cookie('UserToken', token, {
+        httpOnly: true,
+        secure: false,
+        // sameSite: 'strict'
+        sameSite: 'lax'
+    });
+    console.log("Cookie Set:", token); 
+    console.log("id set", user.id); 
+      res.json({ message: 'Logged in', token, user: { id: user.id } });
+
+      // res.json({ message: 'Login successful', user: { id: user.id } });
+      // please check later on that email if not passed will not create probelm. id is the main thing
     } else {
       res.status(401).json({ error: 'Invalid email or password' });
     }
   });
 });
 
+const authenticateUser = (req, res, next) => {
+  console.log("Cookies received in request:", req.cookies);
+
+  const token = req.cookies.UserToken;
+
+  if (!token) {
+      console.error("No token found in cookies.");
+      return res.status(401).json({ error: 'Unauthorized - No token provided' });
+  }
+
+  jwt.verify(token, SECRET_KEY, (err, decoded) => {
+      if (err) {
+          console.error("Invalid token:", err);
+          return res.status(401).json({ error: 'Unauthorized - Invalid token' });
+      }
+
+      console.log("Decoded user from token:", decoded);
+      req.user = decoded;
+      next();
+  });
+};
+
 // Route to fetch user details by ID
-router.get('/details/:userId', (req, res) => {
+router.get('/details/:userId', authenticateUser, (req, res) => {
   const { userId } = req.params;
-  const sql = 'SELECT * FROM users WHERE id = ?';
+  const authenticatedUserId = parseInt(req.user.id, 10);
 
+  console.log("Requested User ID:", userId, "Authenticated User ID:", authenticatedUserId);
+
+  if (parseInt(userId, 10) !== authenticatedUserId) {
+      console.log("Access Denied: User ID mismatch");
+      return res.status(403).json({ error: 'Forbidden - Access denied' });
+  }
+
+  const sql = 'SELECT id, name FROM users WHERE id = ?';
   connection.query(sql, [userId], (err, results) => {
-    if (err) {
-      console.error('Database error:', err.message);
-      return res.status(500).json({ error: 'Database error' });
-    }
+      if (err) {
+          console.error('Database error:', err.message);
+          return res.status(500).json({ error: 'Database error' });
+      }
 
-    if (results.length > 0) {
-      res.json({ message: 'User found', user: results[0] });
-    } else {
-      res.status(404).json({ error: 'User not found' });
-    }
+      if (results.length > 0) {
+          const { id, name } = results[0];
+          res.json({ message: 'User found', user: { id, name } });
+      } else {
+          res.status(404).json({ error: 'User not found' });
+      }
   });
 });
+
+
+
 
 router.post('/userCheck', (req, res) => {
   const { email } = req.body;
@@ -166,5 +223,11 @@ router.post('/otpSent', (req, res) => {
     }
   })
 })
+
+router.post('/logout', (req, res) => {
+  res.clearCookie('UserToken', { httpOnly: true, secure: false, sameSite: 'Lax' });
+  res.json({ message: 'Logged out successfully' });
+});
+
 
 module.exports = router;

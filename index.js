@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const connection = require('./connection');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const app = express();
 
 // Middleware
@@ -11,7 +12,9 @@ app.use(cors({
   credentials: true,
   allowedHeaders: ['Content-Type'],
 }));
+
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 // Connect to DB
 connection.connect((err) => {

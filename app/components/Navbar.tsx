@@ -5,10 +5,27 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
-  const handleLogout = () => {
-    console.log("User logged out");
-    router.push('/login');
+  
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/users/logout', {
+        method: 'POST',
+        credentials: 'include', 
+      });
+  
+      if (response.ok) {
+        console.log('Logout successful');
+        alert('Logged out successfully!');
+        router.push('/login'); // Redirect to login page
+      } else {
+        console.error('Logout failed');
+      }
+    } catch (err) {
+      console.error('Error during logout:', err);
+    }
   };
+  
 
   return (
     <nav className="bg-gray-100 border-b border-gray-300 dark:bg-gray-800 dark:border-gray-700">

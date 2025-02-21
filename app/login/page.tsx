@@ -25,14 +25,18 @@ export default function Login() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
+        credentials: 'include'  //very important line. with this we can able to see token in cookies section
       });
 
       if (response.ok) {
-        let responseJson, userId, useremail;
+        let responseJson, userId, userToken;
         try {
           responseJson = await response.json();
+          userToken = responseJson.token;
           userId = responseJson.user.id;
-          useremail = responseJson.user.email;
+          console.log("from frontend token is ", userToken)
+          console.log("user id i got in frontend ", userId)
+          // useremail = responseJson.user.email;
           // console.log(responseJson);
         } catch (error) {
           console.error("Error parsing JSON response:", error);

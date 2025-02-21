@@ -15,15 +15,19 @@ export default function UserPage() {
   // Fetch user details from the backend
   const getDetails = async () => {
     try {
+      console.log("Fetching details for user:", userId);
+
       const response = await fetch(`http://localhost:8000/api/users/details/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
       });
 
       if (response.ok) {
         const responseJson = await response.json();
+        console.log("Fetched user details:", responseJson.user);
         setUserName(responseJson.user.name);
       } else {
         const errorData = await response.json();
@@ -31,22 +35,23 @@ export default function UserPage() {
         setError(errorData.error);
       }
     } catch (err) {
-      console.error('Error submitting form:', err);
+      console.error('Error fetching user details:', err);
+      // setError('Network error');
     }
   };
 
   useEffect(() => {
-    if (userId !== 'Guest') {
+    if (userId !== 'Guest' && !userName) {
       getDetails();
     }
-  }, [userId]);
+  }, [userId, userName]); // Add userName to dependencies
 
   return (
     <>
       <Navbar />
       <div className="container mx-auto px-4 py-6 bg-gray-900 text-white text-center md:text-left bg-gray-900">
         <h1 className="text-2xl font-bold">
-          Welcome, {userName || `User ${userId}`}!
+          {userName ? `Welcome, ${userName}!` : `Welcome, User ${userId}`}
         </h1>
         {error && (
           <p className="text-red-500 mt-2">
@@ -54,9 +59,12 @@ export default function UserPage() {
           </p>
         )}
       </div>
-      <Transaction userId={userId} /> 
-      {/* userName is not passed through props. It has been fetched by userId from the users table from database. 
-      sql triggers added for this */}
+
+      {userName ? (
+        <Transaction userId={userId} />
+      ) : (
+        <p className="text-red-500 text-center mt-4">Unauthorized Access</p>
+      )}
     </>
   );
 }
