@@ -111,9 +111,6 @@ router.post('/login', (req, res) => {
     console.log("Cookie Set:", token); 
     console.log("id set", user.id); 
       res.json({ message: 'Logged in', token, user: { id: user.id } });
-
-      // res.json({ message: 'Login successful', user: { id: user.id } });
-      // please check later on that email if not passed will not create probelm. id is the main thing
     } else {
       res.status(401).json({ error: 'Invalid email or password' });
     }
@@ -127,7 +124,7 @@ const authenticateUser = (req, res, next) => {
 
   if (!token) {
       console.error("No token found in cookies.");
-      return res.status(401).json({ error: 'Unauthorized - No token provided' });
+      return res.status(401).json({ error: '' });
   }
 
   jwt.verify(token, SECRET_KEY, (err, decoded) => {
@@ -169,8 +166,6 @@ router.get('/details/:userId', authenticateUser, (req, res) => {
       }
   });
 });
-
-
 
 
 router.post('/userCheck', (req, res) => {
@@ -217,9 +212,23 @@ router.post('/otpSent', (req, res) => {
     }
     if (results.length > 0) {
       const user = results[0];
-      res.json({ message: 'Login successful', user: { id: user.id } });
+
+      const token = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: '1h' }); //token created for that id
+      console.log("from backend token is ", token);
+      res.cookie('UserToken', token, {
+        httpOnly: true,
+        secure: false,
+        // sameSite: 'strict'
+        sameSite: 'lax'
+    });
+    console.log("Cookie Set:", token); 
+    console.log("id set", user.id); 
+      res.json({ message: 'Logged in', token, user: { id: user.id } });
+
+      // res.json({ message: 'Login successful', user: { id: user.id } });
+      // please check later on that email if not passed will not create probelm. id is the main thing
     } else {
-      res.status(401).json({ error: 'Invalid name or password' });
+      res.status(401).json({ error: 'Invalid email or password' });
     }
   })
 })

@@ -62,10 +62,12 @@ export default function OtpLogin() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp: otpString }),
+        credentials: 'include'
       });
 
       if (response.ok) {
         const responseJson = await response.json();
+        const userToken = responseJson.token;
         const userId = responseJson.user.id;
         setEmail('');
         setOtp(['', '', '', '', '', '']);
