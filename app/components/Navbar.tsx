@@ -5,15 +5,15 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
-  
+
 
   const handleLogout = async () => {
     try {
       const response = await fetch('http://localhost:8000/api/users/logout', {
         method: 'POST',
-        credentials: 'include', 
+        credentials: 'include',
       });
-  
+
       if (response.ok) {
         console.log('Logout successful');
         alert('Logged out successfully!');
@@ -25,7 +25,7 @@ export default function Navbar() {
       console.error('Error during logout:', err);
     }
   };
-  
+
 
   return (
     <nav className="bg-gray-100 border-b border-gray-300 dark:bg-gray-800 dark:border-gray-700">

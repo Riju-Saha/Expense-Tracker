@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TextInput from '../components/textInput';
 import { useRouter } from 'next/navigation';
 
@@ -63,12 +63,28 @@ export default function Login() {
 
   const handleLoginWithOtp = () => {
     router.push('/otpLogin');
-  }
+  };
+
 
   return (
     <div style={styles.container}>
       <div style={styles.card}>
         <div className="card-body">
+          <button
+            onClick={() => window.location.href = '/'}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              // backgroundColor: '#f5f5f5',
+              color: 'white',
+              padding: '10px 15px',
+              borderRadius: '5px',
+              border: 'none',
+              cursor: 'pointer',
+            }}>Expense Tracker
+          </button>
+
           <button
             onClick={() => window.location.href = '/register'} // Redirect to login page
             style={{
@@ -82,8 +98,7 @@ export default function Login() {
               border: 'none',
               cursor: 'pointer',
             }}
-          >
-            Register
+          >Register
           </button>
 
           <h3 className="card-title text-center mb-4" style={{ fontSize: '22px' }}>Login</h3>

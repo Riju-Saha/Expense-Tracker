@@ -4,8 +4,10 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Transaction from '../components/transactionForm';
 import { useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function UserPage() {
+  const router = useRouter();
   const params = useParams();
   const userId = Array.isArray(params?.userId) ? params.userId[0] : params?.userId || 'Guest';
 
@@ -36,7 +38,6 @@ export default function UserPage() {
       }
     } catch (err) {
       console.error('Error fetching user details:', err);
-      // setError('Network error');
     }
   };
 
@@ -44,7 +45,29 @@ export default function UserPage() {
     if (userId !== 'Guest' && !userName) {
       getDetails();
     }
-  }, [userId, userName]); // Add userName to dependencies
+  }, [userId, userName]);
+
+  useEffect(() => {
+    window.onpopstate = async (event) => {
+      try {
+        const response = await fetch('http://localhost:8000/api/users/logout', {
+          method: 'POST',
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          console.log('Logout successful');
+        } else {
+          console.error('Logout failed');
+        }
+      } catch (err) {
+        console.error('Error during logout:', err);
+      }
+
+      router.push('/login');
+    };
+  }, []);
+
 
   return (
     <>

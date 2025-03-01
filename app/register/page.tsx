@@ -70,6 +70,22 @@ export default function Register() {
         <div style={styles.card}>
           <div className="card-body">
             <button
+              onClick={() => window.location.href = '/'} // Redirect to home page
+              style={{
+                position: 'absolute',
+                top: '10px',
+                left: '10px',
+                // backgroundColor: '#f5f5f5',
+                color: 'white',
+                padding: '10px 15px',
+                borderRadius: '5px',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              Expense Tracker
+            </button>
+            <button
               onClick={() => window.location.href = '/login'} // Redirect to login page
               style={{
                 position: 'absolute',
