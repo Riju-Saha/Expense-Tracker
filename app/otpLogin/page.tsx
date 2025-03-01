@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import TextInput from '../components/textInput';
 import { useRouter } from 'next/navigation';
+import { handleOtpLogin } from '../Auth_utils/otp_login';
+import { handleOtpSent } from '../Auth_utils/otp_sent';
 
 export default function OtpLogin() {
   const [email, setEmail] = useState("");
@@ -26,66 +28,41 @@ export default function OtpLogin() {
     }
   };
 
-  const handleOtpSent = async (e: React.FormEvent) => {
+
+  const handleOtpRequest = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (email.trim().length > 1) {
-      try {
-        const response = await fetch('http://localhost:8000/api/users/userCheck', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
-        });
-
-        if (response.ok) {
-          setOtp(['', '', '', '', '', '']);
-          alert('Check your email for the OTP.');
-        } else {
-          const errorData = await response.json();
-          alert(errorData.message || "This email doesn't exist.");
-        }
-      } catch (error) {
-        console.error('Network error:', error);
-        alert('Something went wrong. Please try again later.');
-      }
+  
+    const result = await handleOtpSent(email);
+  
+    if (result.success) {
+      setOtp(['', '', '', '', '', '']);
+      alert('Check your email for the OTP.');
     } else {
-      alert('Please provide a valid email address.');
+      alert(result.error);
     }
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const otpString = otp.join('');
-
-    try {
-      const response = await fetch('http://localhost:8000/api/users/otpSent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp: otpString }),
-        credentials: 'include'
-      });
-
-      if (response.ok) {
-        const responseJson = await response.json();
-        const userToken = responseJson.token;
-        const userId = responseJson.user.id;
-        setEmail('');
-        setOtp(['', '', '', '', '', '']);
-        alert('Login successful!');
-        router.push(`/${userId}`);
+  
+    const result = await handleOtpLogin(email, otpString);
+  
+    if (result.success) {
+      setEmail('');
+      setOtp(['', '', '', '', '', '']);
+      alert('Login successful!');
+      router.push(`/${result.userId}`);
+    } else {
+      if (result.error === 'Invalid OTP') {
+        alert('Incorrect OTP, check again.');
       } else {
-        const errorData = await response.json();
-        if (errorData.error === 'Invalid OTP') {
-          alert('Incorrect OTP, check again.');
-        } else {
-          alert('Login failed: ' + errorData.error);
-        }
+        alert('Login failed: ' + result.error);
       }
-    } catch (err) {
-      console.error('Error submitting form:', err);
-      alert('Error submitting form. Please try again later.');
     }
   };
+  
 
   const handleLoginWithPassword = () => {
     router.push('/login');
@@ -114,7 +91,7 @@ export default function OtpLogin() {
         <form onSubmit={handleSubmit}>
           <TextInput name="Email" value={email} onChange={handleEmailChange} />
           <div className='mb-2 mt-2' style={{ display: 'flex', justifyContent: 'center' }}>
-            <button style={styles.button} type='button' onClick={handleOtpSent}>Send Otp</button>
+            <button style={styles.button} type='button' onClick={handleOtpRequest}>Send Otp</button>
           </div>
           <div style={styles.otp_container}>
             {otp.map((digit, index) => (

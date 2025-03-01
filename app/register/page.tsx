@@ -1,6 +1,8 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TextInput from '../components/textInput';
+import { handleLogout } from '../Auth_utils/logout';
+import { handleRegister } from '../Auth_utils/regsiter';
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -15,54 +17,29 @@ export default function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Validate phone number before sending to the backend
-    if (!/^\d{10}$/.test(phone)) {
-      alert('Phone number must be exactly 10 digits.');
-      return;
-    }
-
-    const formData = { name, email, password, phone };
-    console.log("Form data to submit:", formData);
-
-    try {
-      const response = await fetch('http://localhost:8000/api/users/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Registration successful:", data);
-        alert("Registered successfully!");
-        setName("");
-        setemail("");
-        setPassword("");
-        setPhone("");
-        window.location.href = '/login';
-      } else {
-        const errorData = await response.json();
-        if (errorData.error.includes('name and email')) {
-          alert('The name and email are already registered. Please try another.');
-        } else if (errorData.error.includes('name')) {
-          alert('The name is already registered. Please choose another name.');
-        } else if (errorData.error.includes('email')) {
-          alert('The email is already registered. Please use another email.');
-        } else if (errorData.error.includes('Phone number')) {
-          alert(errorData.error);
-        } else {
-          alert('Registration failed. Please try again.');
-        }
-        console.error("Registration failed:", errorData);
-      }
-    } catch (err) {
-      console.error("Error submitting form:", err);
-      alert('Error submitting form. Please try again later.');
+  
+    const result = await handleRegister(name, email, password, phone);
+  
+    if (result.success) {
+      alert("Registered successfully!");
+      setName("");
+      setemail("");
+      setPassword("");
+      setPhone("");
+      window.location.href = '/login';
+    } else {
+      alert(result.error);
     }
   };
+  
+
+    // to make sure other cant access someones data from login page by hitting that url
+
+    useEffect(() => {
+      (async () => {
+        await handleLogout();
+      })();
+    }, []);
 
   return (
     <>

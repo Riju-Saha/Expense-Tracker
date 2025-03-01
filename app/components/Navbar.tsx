@@ -1,29 +1,15 @@
 import React, { useState } from "react";
 import { useRouter } from 'next/navigation';
+import { handleLogout } from "../Auth_utils/logout";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
-
-
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('http://localhost:8000/api/users/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        console.log('Logout successful');
-        alert('Logged out successfully!');
-        router.push('/login'); // Redirect to login page
-      } else {
-        console.error('Logout failed');
-      }
-    } catch (err) {
-      console.error('Error during logout:', err);
-    }
+  const onLogoutClick = () => {
+    handleLogout();
+    alert('Logged out successfully!');
+    router.push('/login');
   };
 
 
@@ -44,7 +30,7 @@ export default function Navbar() {
         {/* Logout button */}
         <div className="hidden lg:flex">
           <button
-            onClick={handleLogout}
+            onClick={onLogoutClick}
             className="text-white bg-red-500 hover:bg-red-600 px-4 py-2 rounded-md font-medium"
           >
             Logout
@@ -87,7 +73,7 @@ export default function Navbar() {
           <ul className="flex flex-col space-y-2">
             <li>
               <button
-                onClick={handleLogout}
+                onClick={onLogoutClick}
                 className="block px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-md text-left"
               >
                 Logout

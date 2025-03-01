@@ -1,7 +1,16 @@
 'use client'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { handleLogout } from './Auth_utils/logout';
 
 export default function Home() {
+
+  // also to make sure other cant access someones data from login page by hitting that url
+  useEffect(() => {
+    (async () => {
+      await handleLogout();
+    })();
+  }, []);
+
   return (
     <div style={styles.container}>
       <header style={styles.header}>

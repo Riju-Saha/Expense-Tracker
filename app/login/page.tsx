@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import TextInput from '../components/textInput';
 import { useRouter } from 'next/navigation';
+import { handleLogout } from '../Auth_utils/logout';
+import { handleLogin } from '../Auth_utils/login';
 
 
 export default function Login() {
@@ -14,56 +16,33 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = { email, password };
-
-    console.log("Form data to submit:", formData);
-
-    try {
-      const response = await fetch('http://localhost:8000/api/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-        credentials: 'include'  //very important line. with this we can able to see token in cookies section
-      });
-
-      if (response.ok) {
-        let responseJson, userId, userToken;
-        try {
-          responseJson = await response.json();
-          userToken = responseJson.token;
-          userId = responseJson.user.id;
-          console.log("from frontend token is ", userToken)
-          console.log("user id i got in frontend ", userId)
-          // useremail = responseJson.user.email;
-          // console.log(responseJson);
-        } catch (error) {
-          console.error("Error parsing JSON response:", error);
-          alert("Error parsing server response. Please try again.");
-          return;
-        }
-
-        console.log("Login successful:", userId);
-        setemail("");
-        setPassword("");
-        alert("Login successful!");
-
-        router.push(`/${userId}`); // Direct navigation to the user-specific page
-      } else {
-        const errorData = await response.json();
-        console.error("Login failed:", errorData);
-        alert("Login failed: " + errorData.error);
-      }
-    } catch (err) {
-      console.error("Error submitting form:", err);
-      alert("Error submitting form. Please try again later.");
+  
+    console.log("Form data to submit:", { email, password });
+  
+    const result = await handleLogin(email, password);
+  
+    if (result.success) {
+      setemail("");
+      setPassword("");
+      alert("Login successful!");
+      router.push(`/${result.userId}`);
+    } else {
+      alert("Login failed: " + result.error);
     }
   };
 
   const handleLoginWithOtp = () => {
     router.push('/otpLogin');
   };
+
+  // need to make sure before login that all tokens are destroyed of previous users
+  // also to make sure other cant access someones data from login page by hitting that url
+  useEffect(() => {
+    (async () => {
+      await handleLogout();
+    })();
+  }, []);
+  
 
 
   return (
