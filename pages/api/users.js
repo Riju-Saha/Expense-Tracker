@@ -173,7 +173,8 @@ router.post('/userCheck', (req, res) => {
   const { email } = req.body;
   const sql = 'SELECT * FROM users WHERE email = ?';
   const values = [email];
-  console.log("i got ", values);
+
+  console.log("Received:", values);
 
   connection.query(sql, values, (err, results) => {
     if (err) {
@@ -182,17 +183,19 @@ router.post('/userCheck', (req, res) => {
     }
 
     if (results.length > 0) {
-      const verificationCode = Math.floor(100000 + Math.random() * 900000);
-      const sqlUpdate = 'UPDATE users SET otp = ? WHERE email = ?';
+      const verificationCode = Math.floor(100000 + Math.random() * 900000); // 6-digit OTP
+      const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // Expires in 5 minutes
 
-      connection.query(sqlUpdate, [verificationCode, email], (err, result) => {
+      const sqlUpdate = 'UPDATE users SET otp = ?, otp_expires_at = ? WHERE email = ?';
+
+      connection.query(sqlUpdate, [verificationCode, expiresAt, email], (err, result) => {
         if (err) {
           console.error('Error updating OTP:', err.message);
           return res.status(500).json({ error: 'Database error' });
         }
+
         sendOtpEmail(email, verificationCode); // Send OTP email
-        res.json({ message: 'OTP updated successfully' });
-        // Send response after OTP update
+        res.json({ message: 'OTP sent successfully', expiresAt });
       });
     } else {
       res.status(401).json({ error: 'Email does not exist' });
@@ -200,39 +203,52 @@ router.post('/userCheck', (req, res) => {
   });
 });
 
+
+
 router.post('/otpSent', (req, res) => {
   const { email, otp } = req.body;
   const sql = 'SELECT * FROM users WHERE email = ? AND otp = ?';
   const values = [email, otp];
-  console.log("verification got ", values);
+
+  console.log("Verification received:", values);
 
   connection.query(sql, values, (err, results) => {
     if (err) {
       console.error('Error executing query:', err.message);
       return res.status(500).json({ error: 'Database error' });
     }
+
     if (results.length > 0) {
       const user = results[0];
 
-      const token = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: '1h' }); //token created for that id
-      console.log("from backend token is ", token);
+      const currentTime = new Date();
+      const otpExpiresAt = new Date(user.otp_expires_at);
+
+      if (currentTime > otpExpiresAt) {
+        return res.status(401).json({ error: 'OTP has expired. Please request a new one.' });
+      }
+
+      // If OTP is valid, generate JWT token
+      const token = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: '1h' });
+      console.log("Generated token:", token);
+
+      // Set token in cookies
       res.cookie('UserToken', token, {
         httpOnly: true,
         secure: false,
-        // sameSite: 'strict'
         sameSite: 'lax'
-    });
-    console.log("Cookie Set:", token); 
-    console.log("id set", user.id); 
-      res.json({ message: 'Logged in', token, user: { id: user.id } });
+      });
 
-      // res.json({ message: 'Login successful', user: { id: user.id } });
-      // please check later on that email if not passed will not create probelm. id is the main thing
+      console.log("Cookie Set:", token); 
+      console.log("User ID:", user.id); 
+
+      res.json({ message: 'Logged in', token, user: { id: user.id } });
     } else {
-      res.status(401).json({ error: 'Invalid email or password' });
+      res.status(401).json({ error: 'Invalid OTP or email' });
     }
-  })
-})
+  });
+});
+
 
 router.post('/logout', (req, res) => {
   res.clearCookie('UserToken', { httpOnly: true, secure: false, sameSite: 'Lax' });
