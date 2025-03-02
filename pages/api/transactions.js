@@ -12,6 +12,10 @@ router.post('/', (req, res) => {
     return res.status(400).json({ error: 'All fields are required.' });
   }
 
+  // if (time.includes(':')) {
+  //   time = time.slice(0, 5); // Extract HH:mm only
+  // }
+
   // Fetch user_name from users table based on user_id
   const getUserSql = 'SELECT name FROM users WHERE id = ?';
   connection.query(getUserSql, [user_id], (err, results) => {
@@ -47,7 +51,7 @@ router.post('/', (req, res) => {
 router.get('/:user_id', (req, res) => {
   const { user_id } = req.params;
 
-  const sql = 'SELECT * FROM transactions WHERE user_id = ? ORDER BY date DESC, time DESC';
+  const sql = 'SELECT * FROM transactions WHERE user_id = ?';
 
   connection.query(sql, [user_id], (err, result) => {
     if (err) {
@@ -55,17 +59,30 @@ router.get('/:user_id', (req, res) => {
       return res.status(500).json({ error: 'Database error' });
     }
 
-    res.status(200).json(result);
+    const convertedResults = result.map(transaction => {
+      if (transaction.date) {
+        let dateObj = new Date(transaction.date);
+        dateObj.setHours(dateObj.getHours() + 5);
+        dateObj.setMinutes(dateObj.getMinutes() + 30);
+
+        transaction.date = dateObj.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+      }
+      return transaction;
+    });
+
+    console.log("Sending result from back to front:", convertedResults);
+    res.status(200).json(convertedResults);
   });
 });
 
+
 router.put('/:transaction_id', (req,res) => {
-  const { amount, status, type, title } = req.body;
+  const { amount, status, type, title, date, time } = req.body;
   const { transaction_id } = req.params;
 
-  const sql = 'UPDATE transactions SET amount = ?, status = ?, type = ?, title = ? WHERE id = ?'
+  const sql = 'UPDATE transactions SET amount = ?, status = ?, type = ?, title = ?, date = ?, time = ? WHERE id = ?'
   
-  connection.query(sql, [amount, status, type, title, transaction_id], (err, result) => {
+  connection.query(sql, [amount, status, type, title, date, time, transaction_id], (err, result) => {
     if (err) {
       console.error('Error updating transaction:', err.message);
       return res.status(500).json({ error: 'Database error' });

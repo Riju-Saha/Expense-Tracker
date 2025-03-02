@@ -1,3 +1,4 @@
+require('dotenv').config();
 const nodemailer = require('nodemailer');
 const express = require('express');
 const connection = require('../../connection');
@@ -11,13 +12,13 @@ router.use(cors({
 }));
 
 
-const SECRET_KEY = 'rijudona';
+const SECRET_KEY = process.env.SECRET_KEY;
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'o.56.soumyajit@gmail.com',
-    pass: 'gfbc qiku urfk ecup',
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 

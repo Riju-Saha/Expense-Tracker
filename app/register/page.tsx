@@ -52,7 +52,6 @@ export default function Register() {
                 position: 'absolute',
                 top: '10px',
                 left: '10px',
-                // backgroundColor: '#f5f5f5',
                 color: 'white',
                 padding: '10px 15px',
                 borderRadius: '5px',

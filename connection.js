@@ -1,9 +1,10 @@
+require('dotenv').config();
 const mysql = require('mysql');
 
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    database: 'expense_tracker_db'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    database: process.env.DB_NAME,
 });
 
 module.exports = connection;

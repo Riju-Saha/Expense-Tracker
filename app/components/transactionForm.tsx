@@ -38,16 +38,16 @@ const TransactionComponent: React.FC<TransactionProps> = ({ userId }) => {
     direction: 'asc',
   });
 
-  const getFormattedDateTime = () => {
+  const updateDateTime = (): void => {
+    if (editing) return; // Prevent updates when editing
+  
     const dateInUTC = new Date();
-    
     const dateOptions: Intl.DateTimeFormatOptions = {
       timeZone: 'Asia/Kolkata',
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
     };
-    
     const timeOptions: Intl.DateTimeFormatOptions = {
       timeZone: 'Asia/Kolkata',
       hour: '2-digit',
@@ -55,19 +55,9 @@ const TransactionComponent: React.FC<TransactionProps> = ({ userId }) => {
       hour12: false,
     };
   
-    return {
-      formattedDate: dateInUTC.toLocaleDateString('en-IN', dateOptions),
-      formattedTime: dateInUTC.toLocaleTimeString('en-IN', timeOptions),
-    };
-  };
+    const formattedDate = dateInUTC.toLocaleDateString('en-IN', dateOptions);
+    const formattedTime = dateInUTC.toLocaleTimeString('en-IN', timeOptions);
   
-
-  // Function to get current date and time in IST
-  const updateDateTime = (): void => {
-    if (editing) return; // Prevent updates when editing
-
-    const { formattedDate, formattedTime } = getFormattedDateTime();
-
     const [day, month, year] = formattedDate.split('/');
     const [hours, minutes] = formattedTime.split(':');
   
@@ -90,7 +80,9 @@ const TransactionComponent: React.FC<TransactionProps> = ({ userId }) => {
     try {
       const response = await axios.get(`http://localhost:8000/api/transactions/${userId}`);
       setTransactions(response.data);
+      console.log("i got from back to front ",transactions);
       setFilteredTransactions(response.data); // Set default filtered list to all transactions
+      console.log("i got from back to front again ", filteredTransactions);
     } catch (err) {
       setError('An error occurred while fetching transactions');
     }
@@ -110,7 +102,9 @@ const TransactionComponent: React.FC<TransactionProps> = ({ userId }) => {
         amount,
         status: paymentStatus,
         type: transactionType,
-        title
+        title,
+        date,
+        time,
       };
       try {
         const response = await axios.put(`http://localhost:8000/api/transactions/${transactionId}`, transactionData);
@@ -135,10 +129,27 @@ const TransactionComponent: React.FC<TransactionProps> = ({ userId }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const { formattedDate, formattedTime } = getFormattedDateTime();
+    const dateInUTC = new Date();
+    const dateOptions: Intl.DateTimeFormatOptions = {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    };
+    const formattedDate = dateInUTC.toLocaleDateString('en-CA', dateOptions).toString().split('T')[0];
+
+    const timeOptions: Intl.DateTimeFormatOptions = {
+      timeZone: 'Asia/Kolkata',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    };
+    const formattedTime = dateInUTC.toLocaleTimeString('en-GB', timeOptions);
 
     setDate(formattedDate); // YYYY-MM-DD
     setTime(formattedTime); // HH:mm
+
+    console.log("date posting to database is ",formattedDate);
 
     const transactionData = {
       user_id: userId,

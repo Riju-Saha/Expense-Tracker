@@ -47,27 +47,6 @@ export default function UserPage() {
     }
   }, [userId, userName]);
 
-  // useEffect(() => {
-  //   window.onpopstate = async (event) => {
-  //     try {
-  //       const response = await fetch('http://localhost:8000/api/users/logout', {
-  //         method: 'POST',
-  //         credentials: 'include',
-  //       });
-
-  //       if (response.ok) {
-  //         console.log('Logout successful');
-  //       } else {
-  //         console.error('Logout failed');
-  //       }
-  //     } catch (err) {
-  //       console.error('Error during logout:', err);
-  //     }
-
-  //     router.push('/login');
-  //   };
-  // }, []);
-
   useEffect(() => {
     window.onpopstate = (event) => {
       router.push('/login');
@@ -92,7 +71,7 @@ export default function UserPage() {
       {userName ? (
         <Transaction userId={userId} />
       ) : (
-        <p className="text-red-500 text-center mt-4">Unauthorized Access</p>
+        <p className="text-red-500 text-center mt-4">Unauthorized Access <br /> Login to continue</p>
       )}
     </>
   );
