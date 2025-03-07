@@ -89,7 +89,7 @@ export default function OtpLogin() {
         </button>
         <h3 className="card-title text-center mb-4" style={{ fontSize: '22px' }}>Login</h3>
         <form onSubmit={handleSubmit}>
-          <TextInput name="Email" value={email} onChange={handleEmailChange} />
+          <TextInput name="Email" type = 'email' value={email} onChange={handleEmailChange} />
           <div className='mb-2 mt-2' style={{ display: 'flex', justifyContent: 'center' }}>
             <button style={styles.button} type='button' onClick={handleOtpRequest}>Send Otp</button>
           </div>

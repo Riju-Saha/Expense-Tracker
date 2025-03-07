@@ -16,11 +16,11 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     console.log("Form data to submit:", { email, password });
-  
+
     const result = await handleLogin(email, password);
-  
+
     if (result.success) {
       setemail("");
       setPassword("");
@@ -42,7 +42,13 @@ export default function Login() {
       await handleLogout();
     })();
   }, []);
-  
+
+
+  const handleForgetPassword = () => {
+    // alert("link activated");
+    router.push('/changePassword')
+  }
+
 
 
   return (
@@ -55,7 +61,6 @@ export default function Login() {
               position: 'absolute',
               top: '10px',
               left: '10px',
-              // backgroundColor: '#f5f5f5',
               color: 'white',
               padding: '10px 15px',
               borderRadius: '5px',
@@ -83,16 +88,17 @@ export default function Login() {
           <h3 className="card-title text-center mb-4" style={{ fontSize: '22px' }}>Login</h3>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <TextInput name="Email" value={email} onChange={handleemailChange} />
+              <TextInput name="Email" type='email' value={email} onChange={handleemailChange} />
             </div>
 
             <div className="mb-3">
-              <TextInput name="Password" value={password} onChange={handlePasswordChange} />
+              <TextInput name="Password" type='password' value={password} onChange={handlePasswordChange} />
             </div>
 
             <div style={styles.buttonContainer}>
-              <button style={styles.button} type="submit">Login</button>
               <button style={styles.button} onClick={handleLoginWithOtp}>Login with OTP?</button>
+              <button style={styles.button} type="submit">Login</button>
+              <a onClick={handleForgetPassword} style={{cursor: 'pointer'}}>Forgot password?</a>
             </div>
           </form>
         </div>
@@ -114,11 +120,12 @@ const styles = {
   },
   buttonContainer: {
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'space-around',
     gap: '10px',
     marginTop: '20px',
     width: '100%',
     position: 'relative' as 'relative',
+    alignItems: 'center',
   },
   card: {
     backgroundColor: '#333',

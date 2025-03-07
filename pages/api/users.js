@@ -204,6 +204,38 @@ router.post('/userCheck', (req, res) => {
 });
 
 
+router.post('/otpVerifySent', (req, res) => {
+  const { email, otp } = req.body;
+  const sql = 'SELECT * FROM users WHERE email = ? AND otp = ?';
+  const values = [email, otp];
+
+  console.log("Verification received:", values);
+  connection.query(sql, values, (err, results) => {
+    if (err) {
+      console.error('Error executing query:', err.message);
+      return res.status(500).json({ error: 'Database error' });
+    }
+
+    if (results.length > 0) {
+      const user = results[0];
+
+      const currentTime = new Date();
+      const otpExpiresAt = new Date(user.otp_expires_at);
+
+      if (currentTime > otpExpiresAt) {
+        return res.status(401).json({ error: 'OTP has expired. Please request a new one.' });
+      }
+
+      console.log("User ID:", user.id); 
+
+      res.json({ message: 'Logged in', user: { id: user.id } });
+    } else {
+      res.status(401).json({ error: 'Invalid OTP or email' });
+    }
+  });
+
+})
+
 
 router.post('/otpSent', (req, res) => {
   const { email, otp } = req.body;
@@ -249,11 +281,33 @@ router.post('/otpSent', (req, res) => {
   });
 });
 
+router.post('/resetPassword', (req, res) => {
+  const { email, newPassword } = req.body;
+
+  if (!email || !newPassword) {
+    return res.status(400).json({ error: 'Email and new password are required' });
+  }
+
+  const sql = 'UPDATE users SET password = ? WHERE email = ?';
+  const values = [newPassword, email];
+
+  connection.query(sql, values, (err, results) => {
+    if (err) {
+      console.error('Error executing query:', err.message);
+      res.status(500).json({ error: 'Database error' });
+    } else if (results.affectedRows > 0) {
+      res.json({ success: true, message: 'Password updated successfully' });
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
+  });
+});
+
 
 router.post('/logout', (req, res) => {
   res.clearCookie('UserToken', { httpOnly: true, secure: false, sameSite: 'Lax' });
   res.json({ message: 'Logged out successfully' });
 });
-
+ 
 
 module.exports = router;
