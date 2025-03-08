@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import TextInput from '../components/textInput';
 import { handleLogout } from '../Auth_utils/logout';
 import { handleRegister } from '../Auth_utils/regsiter';
+import useAutoLogout from '../Auth_utils/useAutoLogout';
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -32,14 +33,7 @@ export default function Register() {
     }
   };
   
-
-    // to make sure other cant access someones data from login page by hitting that url
-
-    useEffect(() => {
-      (async () => {
-        await handleLogout();
-      })();
-    }, []);
+  useAutoLogout();
 
   return (
     <>
@@ -81,19 +75,19 @@ export default function Register() {
             <h3 className="card-title text-center mb-4">Register</h3>
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
-                <TextInput name="Name" value={name} onChange={handleNameChange} />
+                <TextInput name="Name" value={name} onChange={handleNameChange} type='text' />
               </div>
 
               <div className="mb-3">
-                <TextInput name="email" value={email} onChange={handleemailChange} />
+                <TextInput name="email" value={email} onChange={handleemailChange} type='email' />
               </div>
 
               <div className="mb-3">
-                <TextInput name="Password" value={password} onChange={handlePasswordChange} />
+                <TextInput name="Password" value={password} onChange={handlePasswordChange} type='password' />
               </div>
 
               <div className="mb-3">
-                <TextInput name="Phone" value={phone} onChange={handlePhoneChange} />
+                <TextInput name="Phone" value={phone} onChange={handlePhoneChange} type='tel' />
               </div>
 
               <div style={{ margin: 'auto', width: '20%' }}>

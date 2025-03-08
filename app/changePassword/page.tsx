@@ -1,43 +1,51 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import TextInput from '../components/textInput';
 import { useRouter } from 'next/navigation';
-// import {  } from '../Auth_utils/otp_sent';
 import { handleVerifyOtpLogin, handleOtpSent } from '../Auth_utils/otp_service';
 import { handleLogout } from '../Auth_utils/logout';
+import useAutoLogout from '../Auth_utils/useAutoLogout';
 
 export default function ChangePassword() {
     const [email, setEmail] = useState("");
-    const [otp, setOtp] = useState(['', '', '', '', '', '']);
-    const router = useRouter();
-
     const [isVerified, setIsVerified] = useState(false);
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
-    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
+    const router = useRouter();
 
-    const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-        const newOtp = [...otp];
-        const value = e.target.value;
+    const length = 6; // Set OTP length
+    const [otp, setOtp] = useState<string[]>(new Array(length).fill(""));
 
+    const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+    const setRef = (el: HTMLInputElement | null, index: number) => {
+        if (el) inputRefs.current[index] = el;
+    };
+
+    const handleChange = (index: number, value: string) => {
         if (!/^\d?$/.test(value)) return;
 
+        const newOtp = [...otp];
         newOtp[index] = value;
         setOtp(newOtp);
 
-        if (value && index < otp.length - 1) {
-            document.getElementById(`otp-input-${index + 1}`)?.focus();
-        } else if (!value && index > 0) {
-            document.getElementById(`otp-input-${index - 1}`)?.focus();
+        if (value && index < length - 1) {
+            inputRefs.current[index + 1]?.focus();
         }
     };
+
+    const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Backspace" && !otp[index] && index > 0) {
+            inputRefs.current[index - 1]?.focus();
+        }
+    };
+
+    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
 
     const handleOtpRequest = async (e: React.FormEvent) => {
         e.preventDefault();
 
         const result = await handleOtpSent(email);
-        // const result = await handleVerifyOtpSent(email);
 
         if (result.success) {
             setOtp(['', '', '', '', '', '']);
@@ -51,7 +59,6 @@ export default function ChangePassword() {
         e.preventDefault();
         const otpString = otp.join('');
 
-        // const result = await handleOtpLogin(email, otpString);
         const result = await handleVerifyOtpLogin(email, otpString);
 
         if (result.success) {
@@ -87,13 +94,7 @@ export default function ChangePassword() {
         }
     };
 
-      // need to make sure before login that all tokens are destroyed of previous users
-      // also to make sure other cant access someones data from login page by hitting that url
-      useEffect(() => {
-        (async () => {
-          await handleLogout();
-        })();
-      }, []);
+    useAutoLogout();
 
     return (
         <div style={styles.container}>
@@ -101,16 +102,7 @@ export default function ChangePassword() {
                 <div className="card-body">
                     <button
                         onClick={() => window.location.href = '/'}
-                        style={{
-                            position: 'absolute',
-                            top: '10px',
-                            left: '10px',
-                            color: 'white',
-                            padding: '10px 15px',
-                            borderRadius: '5px',
-                            border: 'none',
-                            cursor: 'pointer',
-                        }}>Expense Tracker
+                        style={styles.home_button as React.CSSProperties}>Expense Tracker
                     </button>
 
                     <h3 className="card-title text-center mb-4" style={{ fontSize: '22px' }}>
@@ -141,18 +133,18 @@ export default function ChangePassword() {
                             <div className='mb-2 mt-2' style={{ display: 'flex', justifyContent: 'center' }}>
                                 <button style={styles.button} type="button" onClick={handleOtpRequest}>Send Otp</button>
                             </div>
-                            <div style={styles.otp_container}>
-                                {otp.map((digit, index) => (
+
+                            <div className="flex gap-2" style={{ alignItems: 'center' }}>
+                                Enter OTP: {otp.map((digit, index) => (
                                     <input
                                         key={index}
-                                        id={`otp-input-${index}`}
+                                        ref={(el) => setRef(el, index)}
                                         type="text"
                                         value={digit}
-                                        onChange={(e) => handleOtpChange(e, index)}
                                         maxLength={1}
-                                        placeholder="-"
-                                        style={styles.otp_input_box}
-                                        aria-label={`OTP Digit ${index + 1}`}
+                                        onChange={(e) => handleChange(index, e.target.value)}
+                                        onKeyDown={(e) => handleKeyDown(index, e)}
+                                        className="w-12 h-12 text-center text-xl border border-gray-500 rounded-md bg-gray-900 text-white focus:border-blue-500 focus:outline-none"
                                     />
                                 ))}
                             </div>
@@ -168,26 +160,16 @@ export default function ChangePassword() {
 }
 
 const styles = {
-    otp_container: {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: '10px',
-    },
-    otp_input_box: {
-        width: '40px',
-        height: '40px',
-        textAlign: 'center' as 'center',
-        fontSize: '24px',
-        backgroundColor: '#333',
-        color: '#f5f5f5',
-        border: '1px solid #555',
+    home_button: {
+        position: 'absolute',
+        top: '10px',
+        left: '10px',
+        color: 'white',
+        padding: '10px 15px',
         borderRadius: '5px',
-        outline: 'none',
-        transition: 'border-color 0.3s',
-    },
-    otp_input_box_focus: {
-        borderColor: '#4A90E2',
+        border: 'none',
+        cursor: 'pointer',
+
     },
     button: {
         marginLeft: '10px',

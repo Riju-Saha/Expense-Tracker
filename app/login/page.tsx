@@ -4,6 +4,7 @@ import TextInput from '../components/textInput';
 import { useRouter } from 'next/navigation';
 import { handleLogout } from '../Auth_utils/logout';
 import { handleLogin } from '../Auth_utils/login';
+import useAutoLogout from '../Auth_utils/useAutoLogout';
 
 
 export default function Login() {
@@ -35,13 +36,7 @@ export default function Login() {
     router.push('/otpLogin');
   };
 
-  // need to make sure before login that all tokens are destroyed of previous users
-  // also to make sure other cant access someones data from login page by hitting that url
-  useEffect(() => {
-    (async () => {
-      await handleLogout();
-    })();
-  }, []);
+  useAutoLogout();
 
 
   const handleForgetPassword = () => {
