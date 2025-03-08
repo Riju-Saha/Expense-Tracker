@@ -52,32 +52,12 @@ export default function Login() {
         <div className="card-body">
           <button
             onClick={() => window.location.href = '/'}
-            style={{
-              position: 'absolute',
-              top: '10px',
-              left: '10px',
-              color: 'white',
-              padding: '10px 15px',
-              borderRadius: '5px',
-              border: 'none',
-              cursor: 'pointer',
-            }}>Expense Tracker
+            style={styles.home_button as React.CSSProperties}>Expense Tracker
           </button>
 
           <button
-            onClick={() => window.location.href = '/register'} // Redirect to login page
-            style={{
-              position: 'absolute',
-              top: '10px',
-              right: '10px',
-              backgroundColor: '#f5f5f5',
-              color: 'black',
-              padding: '10px 15px',
-              borderRadius: '5px',
-              border: 'none',
-              cursor: 'pointer',
-            }}
-          >Register
+            onClick={() => window.location.href = '/register'}
+            style={styles.register_button as React.CSSProperties}>Register
           </button>
 
           <h3 className="card-title text-center mb-4" style={{ fontSize: '22px' }}>Login</h3>
@@ -93,7 +73,7 @@ export default function Login() {
             <div style={styles.buttonContainer}>
               <button style={styles.button} onClick={handleLoginWithOtp}>Login with OTP?</button>
               <button style={styles.button} type="submit">Login</button>
-              <a onClick={handleForgetPassword} style={{cursor: 'pointer'}}>Forgot password?</a>
+              <a onClick={handleForgetPassword} style={{ cursor: 'pointer' }}>Forgot password?</a>
             </div>
           </form>
         </div>
@@ -104,6 +84,29 @@ export default function Login() {
 }
 
 const styles = {
+  register_button: {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    backgroundColor: '#f5f5f5',
+    color: 'black',
+    padding: '10px 15px',
+    borderRadius: '5px',
+    border: 'none',
+    cursor: 'pointer',
+  },
+
+  home_button: {
+    position: 'absolute',
+    top: '10px',
+    left: '10px',
+    color: 'white',
+    padding: '10px 15px',
+    borderRadius: '5px',
+    border: 'none',
+    cursor: 'pointer',
+
+  },
   button: {
     padding: '10px 20px',
     backgroundColor: 'white',

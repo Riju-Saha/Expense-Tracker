@@ -18,9 +18,9 @@ export default function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     const result = await handleRegister(name, email, password, phone);
-  
+
     if (result.success) {
       alert("Registered successfully!");
       setName("");
@@ -32,7 +32,7 @@ export default function Register() {
       alert(result.error);
     }
   };
-  
+
   useAutoLogout();
 
   return (
@@ -41,35 +41,13 @@ export default function Register() {
         <div style={styles.card}>
           <div className="card-body">
             <button
-              onClick={() => window.location.href = '/'} // Redirect to home page
-              style={{
-                position: 'absolute',
-                top: '10px',
-                left: '10px',
-                color: 'white',
-                padding: '10px 15px',
-                borderRadius: '5px',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              Expense Tracker
+              onClick={() => window.location.href = '/'}
+              style={styles.home_button as React.CSSProperties}>Expense Tracker
             </button>
+
             <button
-              onClick={() => window.location.href = '/login'} // Redirect to login page
-              style={{
-                position: 'absolute',
-                top: '10px',
-                right: '10px',
-                backgroundColor: '#f5f5f5',
-                color: 'black',
-                padding: '10px 15px',
-                borderRadius: '5px',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              Login
+              onClick={() => window.location.href = '/login'}
+              style={styles.login_button as React.CSSProperties}>Login
             </button>
 
             <h3 className="card-title text-center mb-4">Register</h3>
@@ -102,6 +80,29 @@ export default function Register() {
 }
 
 const styles = {
+  login_button: {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    backgroundColor: '#f5f5f5',
+    color: 'black',
+    padding: '10px 15px',
+    borderRadius: '5px',
+    border: 'none',
+    cursor: 'pointer',
+  },
+
+  home_button: {
+    position: 'absolute',
+    top: '10px',
+    left: '10px',
+    color: 'white',
+    padding: '10px 15px',
+    borderRadius: '5px',
+    border: 'none',
+    cursor: 'pointer',
+
+  },
   button: {
     marginLeft: '10px',
     padding: '10px 20px',
