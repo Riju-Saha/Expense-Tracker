@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import TextInput from '../components/textInput';
 import { useRouter } from 'next/navigation';
-import { handleOtpLogin } from '../Auth_utils/otp_login';
-import { handleOtpSent } from '../Auth_utils/otp_sent';
+import { handleOtpLogin, handleOtpSent } from '../Auth_utils/otp_service';
+// import { handleOtpSent } from '../Auth_utils/otp_sent';
 
 export default function OtpLogin() {
   const [email, setEmail] = useState("");

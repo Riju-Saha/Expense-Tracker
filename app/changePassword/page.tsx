@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import TextInput from '../components/textInput';
 import { useRouter } from 'next/navigation';
-import { handleOtpSent } from '../Auth_utils/otp_sent';
-import { handleVerifyOtpLogin } from '../Auth_utils/otp_login';
+// import {  } from '../Auth_utils/otp_sent';
+import { handleVerifyOtpLogin, handleOtpSent } from '../Auth_utils/otp_service';
 import { handleLogout } from '../Auth_utils/logout';
 
 export default function ChangePassword() {
