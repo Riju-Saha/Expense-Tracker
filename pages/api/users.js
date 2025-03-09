@@ -6,6 +6,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const mysql = require('mysql2');
 const cors = require('cors');
+const { TbUvIndex } = require('react-icons/tb');
 router.use(cors({
   origin: 'http://localhost:3000',
   credentials: true,
@@ -262,6 +263,7 @@ router.post('/otpSent', (req, res) => {
 
       // If OTP is valid, generate JWT token
       const token = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: '1h' });
+      
       console.log("Generated token:", token);
 
       // Set token in cookies
@@ -270,6 +272,27 @@ router.post('/otpSent', (req, res) => {
         secure: false,
         sameSite: 'lax'
       });
+
+      // right after login the otp will expire
+      // currentTime = otpExpiresAt;
+      console.log("details b4 otp null is ", user);
+
+      const otp_sql = 'UPDATE users SET otp = ? WHERE id = ?';
+      const otp_val = [null, user.id];
+
+      console.log("otp values are ", otp_val);
+
+      connection.query(otp_sql, otp_val, (err, res) => {
+        if (err) {
+          console.error('Error executing query:', err.message);
+          return res.status(500).json({ error: 'Database error' });
+        }
+
+        console.log("Otp is set to null");
+      });
+
+      // console.log("after login otp to be null for ", otp_val);
+      // user.otp = null;
 
       console.log("Cookie Set:", token); 
       console.log("User ID:", user.id); 
@@ -311,3 +334,5 @@ router.post('/logout', (req, res) => {
  
 
 module.exports = router;
+
+
