@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import TextInput from '../components/textInput';
 import { useRouter } from 'next/navigation';
-import { handleLogout } from '../Auth_utils/logout';
 import { handleLogin } from '../Auth_utils/login';
 import useAutoLogout from '../Auth_utils/useAutoLogout';
 
@@ -40,7 +39,6 @@ export default function Login() {
 
 
   const handleForgetPassword = () => {
-    // alert("link activated");
     router.push('/changePassword')
   }
 

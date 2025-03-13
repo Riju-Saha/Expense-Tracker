@@ -16,9 +16,6 @@ const OtpInput = ({ length = 6 }: { length?: number }) => {
             inputRefs.current[index + 1]?.focus();
         }
 
-        // if (newOtp.join("").length === length) {
-        //     alert(`OTP Submitted: ${newOtp.join("")}`);
-        // }
     };
 
     const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
