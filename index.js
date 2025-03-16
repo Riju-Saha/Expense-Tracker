@@ -19,10 +19,10 @@ app.use(cookieParser());
 // Connect to DB
 connection.connect((err) => {
   if (err) {
-    console.error('Error connecting to the database:', err.message);
+    console.error('Error connecting to the database', err.message);
     return;
   }
-  console.log('Connected to the database');
+  console.log('Connected to the database'); 
 });
 
 // Root route for testing

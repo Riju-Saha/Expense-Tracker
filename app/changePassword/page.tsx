@@ -16,6 +16,7 @@ export default function ChangePassword() {
 
     const length = 6; // Set OTP length
     const [otp, setOtp] = useState<string[]>(new Array(length).fill(""));
+    const [otpSent, isOtpSent] = useState(false);
 
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
     const setRef = (el: HTMLInputElement | null, index: number) => {
@@ -49,6 +50,7 @@ export default function ChangePassword() {
 
         if (result.success) {
             setOtp(['', '', '', '', '', '']);
+            isOtpSent(true);
             alert('Check your email for the OTP.');
         } else {
             alert(result.error);
@@ -94,6 +96,18 @@ export default function ChangePassword() {
         }
     };
 
+    // if the verification is not completed within 5 minutes, reset the OTP
+    useEffect(() => {
+        let timer: NodeJS.Timeout;
+        if (otpSent) {
+            timer = setTimeout(() => {
+                isOtpSent(false);
+                setOtp(new Array(length).fill(""));
+            }, 300000); // 5 minutes in milliseconds
+        }
+        return () => clearTimeout(timer);
+    }, [otpSent]);
+
     useAutoLogout();
 
     return (
@@ -111,30 +125,21 @@ export default function ChangePassword() {
 
                     {isVerified ? (
                         <form onSubmit={handlePasswordReset}>
-                            <TextInput
-                                name="New Password"
-                                type="password"
-                                value={newPassword}
-                                onChange={(e) => setNewPassword(e.target.value)}
-                            />
-                            <TextInput
-                                name="Confirm Password"
-                                type="password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                            />
+                            <div className="mb-2">
+                                <TextInput name="New Password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)}/>
+                            </div>
+                            <div className="mt-2">
+                                <TextInput name="Confirm Password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}/>
+                            </div>
                             <div style={styles.buttonContainer}>
                                 <button style={styles.button} type="submit">Change Password</button>
                             </div>
                         </form>
                     ) : (
-                        <form onSubmit={handleVerify}>
+                        <form onSubmit={otpSent ? handleVerify : handleOtpRequest}>
                             <TextInput name="Email" type="email" value={email} onChange={handleEmailChange} />
-                            <div className='mb-2 mt-2' style={{ display: 'flex', justifyContent: 'center' }}>
-                                <button style={styles.button} type="button" onClick={handleOtpRequest}>Send Otp</button>
-                            </div>
 
-                            <div className="flex gap-2" style={{ alignItems: 'center' }}>
+                            <div className="flex gap-2 mt-4" style={{ alignItems: 'center' }}>
                                 Enter OTP: {otp.map((digit, index) => (
                                     <input
                                         key={index}
@@ -149,7 +154,9 @@ export default function ChangePassword() {
                                 ))}
                             </div>
                             <div style={styles.buttonContainer}>
-                                <button style={styles.button} type="submit">Verify</button>
+                                <button style={styles.button} type="submit">
+                                    {otpSent ? 'Verify OTP' : 'Send OTP'}
+                                </button>
                             </div>
                         </form>
                     )}
@@ -169,7 +176,6 @@ const styles = {
         borderRadius: '5px',
         border: 'none',
         cursor: 'pointer',
-
     },
     button: {
         marginLeft: '10px',

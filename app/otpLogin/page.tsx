@@ -10,7 +10,9 @@ export default function OtpLogin() {
   const [email, setEmail] = useState("");
   const length = 6; // Set OTP length
   const [otp, setOtp] = useState<string[]>(new Array(length).fill(""));
+  const [otpSent, isOtpSent] = useState(false);
 
+  const router = useRouter();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const setRef = (el: HTMLInputElement | null, index: number) => {
     if (el) inputRefs.current[index] = el;
@@ -34,8 +36,6 @@ export default function OtpLogin() {
     }
   };
 
-  const router = useRouter();
-
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
 
   const handleOtpRequest = async (e: React.FormEvent) => {
@@ -45,6 +45,7 @@ export default function OtpLogin() {
 
     if (result.success) {
       setOtp(['', '', '', '', '', '']);
+      isOtpSent(true);
       alert('Check your email for the OTP.');
     } else {
       alert(result.error);
@@ -74,6 +75,17 @@ export default function OtpLogin() {
   const handleLoginWithPassword = () => {
     router.push('/login');
   };
+  // if the login verification is not completed within 5 minutes, user has the chance to request for a new OTP
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (otpSent) {
+      timer = setTimeout(() => {
+        isOtpSent(false);
+        setOtp(new Array(length).fill(""));
+      }, 300000); // 5 minutes in milliseconds
+    }
+    return () => clearTimeout(timer);
+  }, [otpSent]);
 
   useAutoLogout();
 
@@ -93,13 +105,10 @@ export default function OtpLogin() {
 
           <h3 className="card-title text-center mb-4" style={{ fontSize: '22px' }}>Login</h3>
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={otpSent ? handleSubmit : handleOtpRequest}>
             <TextInput name="Email" type='email' value={email} onChange={handleEmailChange} />
-            <div className='mb-2 mt-2' style={{ display: 'flex', justifyContent: 'center' }}>
-              <button style={styles.button} type='button' onClick={handleOtpRequest}>Send Otp</button>
-            </div>
 
-            <div className="flex gap-2" style={{ alignItems: 'center' }}>
+            <div className="flex gap-2 mt-4" style={{ alignItems: 'center' }}>
               Enter OTP: {otp.map((digit, index) => (
                 <input
                   key={index}
@@ -115,8 +124,10 @@ export default function OtpLogin() {
             </div>
 
             <div style={styles.buttonContainer}>
-              <button style={styles.button} type="submit">Login</button>
-              <button style={styles.button} type="button" onClick={handleLoginWithPassword}>
+              <button style={styles.button} type="submit">
+                {otpSent ? 'Login' : 'Send OTP'}
+              </button>
+              <button style={{ ...styles.button, position: 'absolute', right: 0 }} type="button" onClick={handleLoginWithPassword}>
                 Login with password?
               </button>
             </div>
@@ -149,7 +160,6 @@ const styles = {
     borderRadius: '5px',
     border: 'none',
     cursor: 'pointer',
-
   },
   button: {
     marginLeft: '10px',
